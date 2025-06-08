@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إضافة اختبار جديد</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --accent-color: #4895ef;
+      --danger-color: #f72585;
+      --warning-color: #f8961e;
+      --success-color: #4cc9f0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --text-color: #2b2d42;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --border-color: #e9ecef;
+    }
+    
+    .dark-mode {
+      --primary-color: #4895ef;
+      --secondary-color: #4361ee;
+      --accent-color: #3f37c9;
+      --light-color: #212529;
+      --dark-color: #f8f9fa;
+      --text-color: #f8f9fa;
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --border-color: #333333;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Tajawal', Arial, sans-serif;
+    }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: all 0.3s ease;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    .form-container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 30px;
+      background: var(--card-bg);
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .page-title {
+      color: var(--primary-color);
+      font-size: 28px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-success {
+      background-color: var(--success-color);
+      color: white;
+    }
+    
+    .btn-success:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-danger {
+      background-color: var(--danger-color);
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      font-size: 15px;
+      transition: border 0.3s ease;
+    }
+    
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+    
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .questions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 40px 0 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .questions-title {
+      font-size: 22px;
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .question-box {
+      margin-top: 25px;
+      padding: 20px;
+      background: rgba(67, 97, 238, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    
+    .question-box:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    
+    .question-number {
+      position: absolute;
+      top: -12px;
+      right: 20px;
+      background: var(--primary-color);
+      color: white;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .option-number {
+      background: var(--accent-color);
+      color: white;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    
+    .remove-question {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: var(--danger-color);
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+    }
+    
+    .remove-question:hover {
+      transform: scale(1.1);
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+      gap: 15px;
+    }
+    
+    .form-actions button {
+      flex: 1;
+    }
+    
+    .toggle-dark {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .toggle-dark:hover {
+      transform: scale(1.1);
+    }
+    
+    @media (max-width: 768px) {
+      .form-container {
+        padding: 20px;
+      }
+      
+      .options-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .btn {
+        padding: 10px 15px;
+        font-size: 14px;
+      }
+      
+      .form-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-container">
+  <div class="page-header">
+    <h1 class="page-title">
+      <i class="fas fa-plus-circle"></i> إضافة اختبار جديد
+    </h1>
+    <button type="button" class="btn btn-danger" onclick="window.location.href='admin.html'">
+      <i class="fas fa-times"></i> إلغاء
+    </button>
+  </div>
+
+  <form id="testForm" onsubmit="saveTest(event)">
+    <div class="form-group">
+      <label for="title">اسم الاختبار</label>
+      <input type="text" id="title" required placeholder="أدخل اسم الاختبار">
+    </div>
+    
+    <div class="form-group">
+      <label for="description">وصف الاختبار</label>
+      <textarea id="description" required placeholder="أدخل وصفًا مختصرًا للاختبار"></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label for="duration">مدة الاختبار (بالدقائق)</label>
+      <input type="number" id="duration" min="1" required placeholder="أدخل المدة بالدقائق">
+    </div>
+
+    <div class="questions-header">
+      <h2 class="questions-title">
+        <i class="fas fa-question-circle"></i> أسئلة الاختبار
+      </h2>
+      <button type="button" class="btn btn-success" onclick="addQuestion()">
+        <i class="fas fa-plus"></i> إضافة سؤال
+      </button>
+    </div>
+    
+    <div id="questionsContainer">
+      <!-- سيتم إضافة الأسئلة هنا -->
+    </div>
+    
+    <div class="form-actions">
+      <button type="button" class="btn btn-danger" onclick="window.location.href='admin.html'">
+        <i class="fas fa-times"></i> إلغاء
+      </button>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> حفظ الاختبار
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+const API_URL = "https://6844373271eb5d1be032b52a.mockapi.io/tests";
+
+let questionCounter = 0;
+
+function addQuestion() {
+  questionCounter++;
+  const qId = `question-${questionCounter}`;
+  const container = document.createElement("div");
+  container.classList.add("question-box");
+  container.innerHTML = `
+    <span class="question-number">${questionCounter}</span>
+    <button type="button" class="remove-question" onclick="removeQuestion(this)">
+      <i class="fas fa-times"></i>
+    </button>
+    
+    <div class="form-group">
+      <label>نص السؤال</label>
+      <input type="text" name="${qId}-title" required placeholder="أدخل نص السؤال">
+    </div>
+    
+    <div class="options-grid">
+      <div class="option-item">
+        <span class="option-number">1</span>
+        <input type="text" name="${qId}-opt1" required placeholder="الخيار الأول">
+      </div>
+      <div class="option-item">
+        <span class="option-number">2</span>
+        <input type="text" name="${qId}-opt2" required placeholder="الخيار الثاني">
+      </div>
+      <div class="option-item">
+        <span class="option-number">3</span>
+        <input type="text" name="${qId}-opt3" required placeholder="الخيار الثالث">
+      </div>
+      <div class="option-item">
+        <span class="option-number">4</span>
+        <input type="text" name="${qId}-opt4" required placeholder="الخيار الرابع">
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label>الإجابة الصحيحة</label>
+      <select name="${qId}-correct" required>
+        <option value="">اختر الإجابة الصحيحة</option>
+        <option value="0">الخيار الأول</option>
+        <option value="1">الخيار الثاني</option>
+        <option value="2">الخيار الثالث</option>
+        <option value="3">الخيار الرابع</option>
+      </select>
+    </div>
+  `;
+  document.getElementById("questionsContainer").appendChild(container);
+}
+
+function removeQuestion(btn) {
+  const all = document.querySelectorAll('.question-box');
+  if (all.length <= 3) {
+    alert("يجب أن يحتوي الاختبار على 3 أسئلة على الأقل");
+    return;
+  }
+
+  if (confirm("هل أنت متأكد من حذف هذا السؤال؟")) {
+    btn.closest('.question-box').remove();
+    updateQuestionNumbers();
+  }
+}
+
+function updateQuestionNumbers() {
+  const questions = document.querySelectorAll('.question-box');
+  questions.forEach((question, index) => {
+    question.querySelector('.question-number').textContent = index + 1;
+  });
+  questionCounter = questions.length;
+}
+
+async function saveTest(event) {
+  event.preventDefault();
+
+  const title = document.getElementById("title").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const duration = parseInt(document.getElementById("duration").value);
+
+  if (!title || !description || duration <= 0) {
+    showAlert("يرجى تعبئة جميع الحقول الأساسية بشكل صحيح", "danger");
+    return;
+  }
+
+  const questionBoxes = document.querySelectorAll(".question-box");
+  if (questionBoxes.length < 3) {
+    showAlert("يجب إضافة 3 أسئلة على الأقل للاختبار", "warning");
+    return;
+  }
+
+  const questions = [];
+  for (let i = 0; i < questionBoxes.length; i++) {
+    const box = questionBoxes[i];
+    const qTitle = box.querySelector(`input[name$="-title"]`).value.trim();
+    const options = [
+      box.querySelector(`input[name$="-opt1"]`).value.trim(),
+      box.querySelector(`input[name$="-opt2"]`).value.trim(),
+      box.querySelector(`input[name$="-opt3"]`).value.trim(),
+      box.querySelector(`input[name$="-opt4"]`).value.trim()
+    ];
+    const correct = parseInt(box.querySelector(`select[name$="-correct"]`).value);
+
+    if (!qTitle || options.some(opt => !opt) || isNaN(correct)) {
+      showAlert(`يرجى تعبئة جميع بيانات السؤال رقم ${i + 1}`, "warning");
+      return;
+    }
+
+    questions.push({
+      question: qTitle,
+      options,
+      correctIndex: correct
+    });
+  }
+
+  const test = {
+    title,
+    description,
+    duration,
+    questions,
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(test)
+    });
+
+    if (!res.ok) throw new Error("فشل حفظ الاختبار");
+
+    showAlert("✅ تم حفظ الاختبار بنجاح", "success");
+    setTimeout(() => window.location.href = "view-tests.html", 1500);
+  } catch (err) {
+    console.error(err);
+    showAlert("❌ حدث خطأ أثناء حفظ الاختبار", "danger");
+  }
+}
+
+function showAlert(message, type) {
+  const alert = document.createElement("div");
+  alert.style.position = "fixed";
+  alert.style.bottom = "20px";
+  alert.style.left = "50%";
+  alert.style.transform = "translateX(-50%)";
+  alert.style.backgroundColor =
+    type === "success" ? "#4CAF50" :
+    type === "warning" ? "#FF9800" :
+    "#F44336";
+  alert.style.color = "white";
+  alert.style.padding = "15px 25px";
+  alert.style.borderRadius = "8px";
+  alert.style.zIndex = "1000";
+  alert.innerHTML = `<i class="fas ${type === "success" ? "fa-check-circle" : type === "warning" ? "fa-exclamation-triangle" : "fa-times-circle"}"></i> ${message}`;
+  document.body.appendChild(alert);
+
+  setTimeout(() => {
+    alert.style.opacity = "0";
+    alert.style.transition = "opacity 0.5s ease";
+    setTimeout(() => alert.remove(), 500);
+  }, 3000);
+}
+
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+  localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+}
+
+if (localStorage.getItem('darkMode') === 'true') {
+  document.body.classList.add('dark-mode');
+}
+
+window.onload = function () {
+  for (let i = 0; i < 3; i++) addQuestion();
+};
+</script>
+
+
+<button class="toggle-dark" onclick="toggleDarkMode()">
+  <i class="fas fa-moon"></i>
+</button>
+
+</body>
+</html>

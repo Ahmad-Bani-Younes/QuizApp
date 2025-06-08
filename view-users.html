@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>عرض المستخدمين</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --accent-color: #4895ef;
+      --danger-color: #f72585;
+      --warning-color: #f8961e;
+      --success-color: #4cc9f0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --text-color: #2b2d42;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --border-color: #e9ecef;
+    }
+    
+    .dark-mode {
+      --primary-color: #4895ef;
+      --secondary-color: #4361ee;
+      --accent-color: #3f37c9;
+      --light-color: #212529;
+      --dark-color: #f8f9fa;
+      --text-color: #f8f9fa;
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --border-color: #333333;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Tajawal', Arial, sans-serif;
+    }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: all 0.3s ease;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    .users-container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 30px;
+      background: var(--card-bg);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .page-title {
+      color: var(--primary-color);
+      font-size: 28px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+    
+    .btn-danger {
+      background-color: var(--danger-color);
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    .btn-warning {
+      background-color: var(--warning-color);
+      color: white;
+    }
+    
+    .btn-warning:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    .table-responsive {
+      overflow-x: auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    
+    th, td {
+      padding: 15px;
+      text-align: right;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    th {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+    
+    tr:hover {
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+    
+    .user-role {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .role-admin {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+    
+    .role-user {
+      background-color: #e8f5e9;
+      color: #388e3c;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-color);
+      opacity: 0.7;
+    }
+    
+    .empty-state i {
+      font-size: 50px;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+    }
+    
+    .empty-state p {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    
+    .toggle-dark {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .toggle-dark:hover {
+      transform: scale(1.1);
+    }
+    
+    @media (max-width: 768px) {
+      .users-container {
+        padding: 15px;
+      }
+      
+      th, td {
+        padding: 10px 8px;
+        font-size: 14px;
+      }
+      
+      .btn {
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+        gap: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="users-container">
+  <div class="page-header">
+    <h1 class="page-title">
+      <i class="fas fa-users"></i> قائمة المستخدمين
+    </h1>
+    <button class="btn btn-primary" onclick="window.location.href='add-user.html'">
+      <i class="fas fa-user-plus"></i> إضافة مستخدم جديد
+    </button>
+  </div>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>الاسم</th>
+          <th>البريد الإلكتروني</th>
+          <th>رقم الهاتف</th>
+          <th>الدور</th>
+          <th>الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody id="userTableBody">
+        <!-- سيتم إدراج الصفوف ديناميكياً -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const API_URL = 'https://6844373271eb5d1be032b52a.mockapi.io/users';
+
+  const currentEmail = sessionStorage.getItem("email");
+  let currentUser = null;
+
+  async function fetchUsers() {
+    try {
+      const res = await fetch(API_URL);
+      return await res.json();
+    } catch (err) {
+      console.error("فشل تحميل المستخدمين:", err);
+      return [];
+    }
+  }
+
+  async function deleteUser(id, userEmail) {
+    if (userEmail === currentEmail) {
+      alert("⚠️ لا يمكنك حذف حسابك كأدمن");
+      return;
+    }
+
+    if (confirm("هل أنت متأكد من حذف هذا المستخدم؟")) {
+      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      location.reload();
+    }
+  }
+
+  function editUser(id) {
+    sessionStorage.setItem("editUserId", id);
+    window.location.href = "edit-user.html";
+  }
+
+  async function init() {
+    const users = await fetchUsers();
+    const table = document.getElementById("userTableBody");
+
+    let found = false;
+
+    users.forEach(user => {
+      if (!user || !user.email) return;
+
+      if (user.email === currentEmail) {
+        currentUser = user;
+      }
+
+      found = true;
+
+      const row = document.createElement("tr");
+      const roleClass = user.role === "admin" ? "role-admin" : "role-user";
+
+      row.innerHTML = `
+        <td>${user.name || "—"}</td>
+        <td>${user.email}</td>
+        <td>${user.phone || "—"}</td>
+        <td><span class="user-role ${roleClass}">${user.role || "user"}</span></td>
+        <td>
+          <div class="action-buttons">
+            <button class="btn btn-warning" onclick="editUser('${user.id}')">
+              <i class="fas fa-edit"></i> تعديل
+            </button>
+            <button class="btn btn-danger" onclick="deleteUser('${user.id}', '${user.email}')">
+              <i class="fas fa-trash"></i> حذف
+            </button>
+          </div>
+        </td>
+      `;
+      table.appendChild(row);
+    });
+
+    if (!currentUser || currentUser.role !== "admin") {
+      alert("⚠️ غير مصرح لك بالوصول إلى هذه الصفحة");
+      window.location.href = "login.html";
+    }
+
+    if (!found) {
+      table.innerHTML = `
+        <tr>
+          <td colspan="5">
+            <div class="empty-state">
+              <i class="fas fa-user-slash"></i>
+              <p>لا يوجد مستخدمين حالياً</p>
+              <button class="btn btn-primary" onclick="window.location.href='add-user.html'">
+                <i class="fas fa-user-plus"></i> إضافة مستخدم جديد
+              </button>
+            </div>
+          </td>
+        </tr>`;
+    }
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+  }
+
+  if (localStorage.getItem('darkMode') === 'true') {
+    document.body.classList.add('dark-mode');
+  }
+
+  window.onload = init;
+</script>
+
+
+<button class="toggle-dark" onclick="toggleDarkMode()">
+  <i class="fas fa-moon"></i>
+</button>
+
+</body>
+</html>

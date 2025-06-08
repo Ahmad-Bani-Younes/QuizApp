@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>عرض جميع الاختبارات</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --accent-color: #4895ef;
+      --danger-color: #f72585;
+      --warning-color: #f8961e;
+      --success-color: #4cc9f0;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --text-color: #2b2d42;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --border-color: #e9ecef;
+    }
+    
+    .dark-mode {
+      --primary-color: #4895ef;
+      --secondary-color: #4361ee;
+      --accent-color: #3f37c9;
+      --light-color: #212529;
+      --dark-color: #f8f9fa;
+      --text-color: #f8f9fa;
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --border-color: #333333;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Tajawal', Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: all 0.3s ease;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    h2 {
+      color: var(--primary-color);
+      font-size: 28px;
+      font-weight: 700;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+    
+    .btn-danger {
+      background-color: var(--danger-color);
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    .btn-warning {
+      background-color: var(--warning-color);
+      color: white;
+    }
+    
+    .btn-warning:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    
+    .table-responsive {
+      overflow-x: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      background-color: var(--card-bg);
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 15px;
+      text-align: right;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    th {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+    
+    tr:hover {
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-color);
+      opacity: 0.7;
+    }
+    
+    .empty-state i {
+      font-size: 50px;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+    }
+    
+    .empty-state p {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+    
+    .toggle-dark {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .toggle-dark:hover {
+      transform: scale(1.1);
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+      
+      th, td {
+        padding: 10px 8px;
+        font-size: 14px;
+      }
+      
+      .btn {
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h2><i class="fas fa-clipboard-list"></i> جميع الاختبارات</h2>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="window.location.href='add-test.html'">
+        <i class="fas fa-plus"></i> إضافة اختبار جديد
+      </button>
+    </div>
+  </header>
+
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th>اسم الاختبار</th>
+          <th>الوصف</th>
+          <th>المدة (دقائق)</th>
+          <th>عدد الأسئلة</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody id="testTableBody">
+        <!-- سيتم تعبئة الاختبارات هنا -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const API_URL = "https://6844373271eb5d1be032b52a.mockapi.io/tests";
+  const tbody = document.getElementById("testTableBody");
+
+  async function loadTests() {
+    try {
+      const res = await fetch(API_URL);
+      if (!res.ok) throw new Error("فشل تحميل الاختبارات");
+      const tests = await res.json();
+
+      if (tests.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <i class="fas fa-clipboard"></i>
+                <p>لا يوجد اختبارات متاحة حالياً</p>
+                <button class="btn btn-primary" onclick="window.location.href='add-test.html'">
+                  <i class="fas fa-plus"></i> إنشاء اختبار جديد
+                </button>
+              </div>
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tests.forEach(test => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${test.title}</td>
+          <td>${test.description || '---'}</td>
+          <td>${test.duration || 0} دقيقة</td>
+          <td>${test.questions?.length || 0}</td>
+          <td>
+            <button class="btn btn-warning" onclick="editTest('${test.id}')">
+              <i class="fas fa-edit"></i> تعديل
+            </button>
+            <button class="btn btn-danger" onclick="deleteTest('${test.id}')">
+              <i class="fas fa-trash"></i> حذف
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } catch (error) {
+      console.error("Error fetching tests:", error);
+      alert("❌ حدث خطأ أثناء تحميل الاختبارات");
+    }
+  }
+
+  async function deleteTest(id) {
+    if (!confirm("هل أنت متأكد أنك تريد حذف هذا الاختبار؟")) return;
+
+    try {
+      const res = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE"
+      });
+
+      if (!res.ok) throw new Error("فشل في حذف الاختبار");
+      alert("✅ تم حذف الاختبار بنجاح");
+      location.reload();
+    } catch (err) {
+      alert("❌ حدث خطأ أثناء الحذف");
+    }
+  }
+
+  function editTest(id) {
+    sessionStorage.setItem("editTestId", id);
+    window.location.href = "edit-test.html";
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    const icon = document.querySelector('.toggle-dark i');
+    icon.classList.toggle('fa-moon');
+    icon.classList.toggle('fa-sun');
+  }
+
+  if (localStorage.getItem('darkMode') === 'true') {
+    document.body.classList.add('dark-mode');
+    const icon = document.querySelector('.toggle-dark i');
+    icon.classList.add('fa-sun');
+    icon.classList.remove('fa-moon');
+  }
+
+  window.onload = loadTests;
+</script>
+
+
+<button class="toggle-dark" onclick="toggleDarkMode()">
+  <i class="fas fa-moon"></i>
+</button>
+
+</body>
+</html>

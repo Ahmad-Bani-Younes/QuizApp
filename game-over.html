@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>انتهت اللعبة</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      background: #fafafa;
+      padding: 60px;
+    }
+    .result-box {
+      display: inline-block;
+      padding: 30px;
+      border: 3px solid #0d47a1;
+      border-radius: 12px;
+      background-color: #fff;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #d32f2f;
+    }
+    p {
+      font-size: 20px;
+      color: #333;
+    }
+    a {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #0d47a1;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+    a:hover {
+      background-color: #06306e;
+    }
+  </style>
+</head>
+<body>
+  <div class="result-box">
+    <h1>💥 انتهت اللعبة</h1>
+    <p id="finalScore">النتيجة: ...</p>
+    <p id="finalTime">الوقت: ...</p>
+    <a href="game.html">🔁 إعادة اللعب</a>
+  </div>
+
+  <script>
+    const score = sessionStorage.getItem("lastScore") || 0;
+    const time = sessionStorage.getItem("lastTime") || 0;
+
+    document.getElementById("finalScore").textContent = `✅ النتيجة: ${score}`;
+    document.getElementById("finalTime").textContent = `⏱ الوقت: ${time} ثانية`;
+  </script>
+</body>
+</html>

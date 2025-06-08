@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>توليد اختبار تلقائي</title>
+  <style>
+    body {
+      font-family: Arial;
+      direction: rtl;
+      background-color: #f4f6f9;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 { color: #0d47a1; margin-bottom: 20px; }
+    label { display: block; margin-bottom: 10px; }
+    select, input, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background-color: #0d47a1;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover { background-color: #06306e; }
+
+    #previewModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    #previewContent {
+      background: white;
+      padding: 20px;
+      max-height: 80vh;
+      overflow-y: auto;
+      border-radius: 10px;
+      width: 80%;
+    }
+
+    .question-preview {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+
+    .close-btn {
+      float: left;
+      background: red;
+      border: none;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>توليد اختبار تلقائي</h2>
+
+  <label for="grade">اختر الصف:</label>
+  <select id="grade" onchange="updateSubjects()">
+    <option value="">-- اختر الصف --</option>
+    <option value="kg1">روضة أولى</option>
+    <option value="kg2">روضة ثانية</option>
+    <option value="1">الصف الأول</option>
+    <option value="2">الصف الثاني</option>
+    <option value="3">الصف الثالث</option>
+    <option value="4">الصف الرابع</option>
+    <option value="5">الصف الخامس</option>
+    <option value="6">الصف السادس</option>
+    <option value="7">الصف السابع</option>
+    <option value="8">الصف الثامن</option>
+    <option value="9">الصف التاسع</option>
+    <option value="10">الصف العاشر</option>
+  </select>
+
+  <label for="subject">اختر المادة:</label>
+  <select id="subject">
+    <option value="">-- اختر الصف أولًا --</option>
+  </select>
+
+  <label for="questionCount">عدد الأسئلة:</label>
+  <input type="number" id="questionCount" value="30" min="5" max="100" />
+
+  <button onclick="fetchQuestions()">🔍 معاينة الأسئلة</button>
+  <button onclick="generateTest()">🚀 توليد الاختبار</button>
+</div>
+
+<div id="previewModal">
+  <div id="previewContent">
+    <button class="close-btn" onclick="closePreview()">إغلاق</button>
+    <div id="questionsPreview"></div>
+  </div>
+</div>
+
+<script>
+  const subjectMap = {
+    kg1: ["اللغة العربية", "الرياضيات"],
+    kg2: ["اللغة العربية", "الرياضيات", "العلوم"],
+    1: ["اللغة العربية", "الرياضيات", "التربية الإسلامية", "العلوم"],
+    2: ["اللغة العربية", "الرياضيات", "العلوم", "الاجتماعيات"],
+    3: ["اللغة العربية", "الرياضيات", "العلوم", "الإنجليزي"],
+    4: ["اللغة العربية", "الرياضيات", "العلوم", "الاجتماعيات", "الإنجليزي"],
+    5: ["اللغة العربية", "الرياضيات", "العلوم", "الاجتماعيات", "الإنجليزي"],
+    6: ["اللغة العربية", "الرياضيات", "العلوم", "الاجتماعيات", "الإنجليزي"],
+    7: ["اللغة العربية", "الرياضيات", "العلوم", "الإنجليزي", "الاجتماعيات"],
+    8: ["العلوم", "الرياضيات", "اللغة العربية", "الإنجليزي", "الاجتماعيات"],
+    9: ["العلوم", "الرياضيات", "اللغة العربية", "الإنجليزي", "الاجتماعيات"],
+    10: ["الفيزياء", "الكيمياء", "الأحياء", "الرياضيات", "اللغة العربية", "الإنجليزي"]
+  };
+
+  let cachedQuestions = [];
+
+  function updateSubjects() {
+    const grade = document.getElementById("grade").value;
+    const subjectSelect = document.getElementById("subject");
+    subjectSelect.innerHTML = "";
+
+    if (!grade || !subjectMap[grade]) {
+      subjectSelect.innerHTML = `<option value="">-- لا توجد مواد متاحة --</option>`;
+      return;
+    }
+
+    subjectMap[grade].forEach(sub => {
+      const opt = document.createElement("option");
+      opt.value = sub;
+      opt.textContent = sub;
+      subjectSelect.appendChild(opt);
+    });
+  }
+
+  async function fetchQuestions() {
+    const subject = document.getElementById('subject').value;
+    const grade = document.getElementById('grade').value;
+    const count = parseInt(document.getElementById('questionCount').value) || 30;
+
+    if (!subject || !grade) return alert("يرجى اختيار الصف والمادة أولًا.");
+
+    const normalizedSubject = subject.replace(/\s+/g, "");
+    const filePath = `questions/grade${grade}_${normalizedSubject}.json`;
+
+    try {
+      const res = await fetch(filePath);
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) {
+        return alert("❌ لا يوجد أسئلة حالياً لهذه المادة.");
+      }
+
+      cachedQuestions = data.sort(() => 0.5 - Math.random()).slice(0, count);
+      showPreview(cachedQuestions);
+    } catch (err) {
+      console.error(err);
+      alert("⚠️ فشل في تحميل ملف الأسئلة. تأكد من وجوده داخل مجلد 'questions'.");
+    }
+  }
+
+  function showPreview(questions) {
+    document.getElementById("questionsPreview").innerHTML = questions.map((q, i) => `
+      <div class="question-preview">
+        <strong>س${i + 1}:</strong> ${q.question}<br>
+        <ul>${q.options.map(opt => `<li>${opt}</li>`).join("")}</ul>
+      </div>
+    `).join("");
+    document.getElementById("previewModal").style.display = "flex";
+  }
+
+  function closePreview() {
+    document.getElementById("previewModal").style.display = "none";
+  }
+
+  function generateTest() {
+    if (!cachedQuestions.length) return alert("يرجى معاينة الأسئلة أولاً.");
+    const subject = document.getElementById('subject').value;
+    const grade = document.getElementById('grade').value;
+
+    const test = {
+      id: `auto_${Date.now()}`,
+      title: `اختبار تلقائي - ${subject} - صف ${grade}`,
+      duration: 35,
+      questions: cachedQuestions
+    };
+
+    const tests = JSON.parse(localStorage.getItem("tests") || "[]");
+    tests.push(test);
+    localStorage.setItem("tests", JSON.stringify(tests));
+    sessionStorage.setItem("current_test_id", test.id);
+
+    alert("✅ تم توليد الاختبار بنجاح!");
+    window.location.href = "quiz.html";
+  }
+</script>
+
+</body>
+</html>

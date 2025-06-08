@@ -1,0 +1,1008 @@
+{
+  "id": "english_test_1",
+  "title": "اختبار اللغة الإنجليزية (English Test)",
+  "description": "اختبار يتكون من 100 سؤال لقياس المهارات الأساسية في اللغة الإنجليزية.",
+  "duration": 20,
+  "questions": [
+    {
+      "question": "What is the synonym of 'happy'? (ver 1)",
+      "options": [
+        "Sad",
+        "Joyful",
+        "Angry",
+        "Tired"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct sentence: (ver 1)",
+      "options": [
+        "She go to school.",
+        "She goes to school.",
+        "She going to school.",
+        "She gone to school."
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which word is a noun? (ver 1)",
+      "options": [
+        "Quickly",
+        "Running",
+        "Happiness",
+        "Blue"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "I ____ a book now. (ver 1)",
+      "options": [
+        "reads",
+        "am reading",
+        "reading",
+        "readed"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The opposite of 'strong' is: (ver 1)",
+      "options": [
+        "Big",
+        "Fast",
+        "Weak",
+        "Brave"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Choose the past form of 'go': (ver 1)",
+      "options": [
+        "Went",
+        "Goed",
+        "Gone",
+        "Go"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Which sentence is correct? (ver 1)",
+      "options": [
+        "He don't like tea.",
+        "He doesn't likes tea.",
+        "He doesn't like tea.",
+        "He don't likes tea."
+      ],
+      "correct": 2
+    },
+    {
+      "question": "How _____ apples are there? (ver 1)",
+      "options": [
+        "much",
+        "many",
+        "any",
+        "some"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct article: ____ apple (ver 1)",
+      "options": [
+        "a",
+        "an",
+        "the",
+        "no article"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which one is an adjective? (ver 1)",
+      "options": [
+        "Run",
+        "Beauty",
+        "Beautiful",
+        "Running"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "He _____ TV every day. (ver 1)",
+      "options": [
+        "watch",
+        "watching",
+        "watches",
+        "watched"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Which one is the plural form? (ver 1)",
+      "options": [
+        "Cat",
+        "Cats",
+        "Cates",
+        "Cattes"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct preposition: I live ___ Amman. (ver 1)",
+      "options": [
+        "on",
+        "at",
+        "in",
+        "to"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What is the comparative of 'good'? (ver 1)",
+      "options": [
+        "more good",
+        "better",
+        "gooder",
+        "best"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which one is a question word? (ver 1)",
+      "options": [
+        "Why",
+        "Because",
+        "Since",
+        "Then"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Choose the correct spelling: (ver 1)",
+      "options": [
+        "Definately",
+        "Defenetly",
+        "Definitely",
+        "Definitly"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "They ____ to the market yesterday. (ver 1)",
+      "options": [
+        "go",
+        "goes",
+        "went",
+        "gone"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What is the past participle of 'write'? (ver 1)",
+      "options": [
+        "Writed",
+        "Writing",
+        "Written",
+        "Wrote"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Choose the correct modal verb: You ____ study more. (ver 1)",
+      "options": [
+        "must",
+        "might",
+        "can",
+        "shall"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "The sun ____ in the east. (ver 1)",
+      "options": [
+        "rise",
+        "rises",
+        "rising",
+        "rose"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What is the synonym of 'happy'? (ver 2)",
+      "options": [
+        "Sad",
+        "Joyful",
+        "Angry",
+        "Tired"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct sentence: (ver 2)",
+      "options": [
+        "She go to school.",
+        "She goes to school.",
+        "She going to school.",
+        "She gone to school."
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which word is a noun? (ver 2)",
+      "options": [
+        "Quickly",
+        "Running",
+        "Happiness",
+        "Blue"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "I ____ a book now. (ver 2)",
+      "options": [
+        "reads",
+        "am reading",
+        "reading",
+        "readed"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The opposite of 'strong' is: (ver 2)",
+      "options": [
+        "Big",
+        "Fast",
+        "Weak",
+        "Brave"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Choose the past form of 'go': (ver 2)",
+      "options": [
+        "Went",
+        "Goed",
+        "Gone",
+        "Go"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Which sentence is correct? (ver 2)",
+      "options": [
+        "He don't like tea.",
+        "He doesn't likes tea.",
+        "He doesn't like tea.",
+        "He don't likes tea."
+      ],
+      "correct": 2
+    },
+    {
+      "question": "How _____ apples are there? (ver 2)",
+      "options": [
+        "much",
+        "many",
+        "any",
+        "some"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct article: ____ apple (ver 2)",
+      "options": [
+        "a",
+        "an",
+        "the",
+        "no article"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which one is an adjective? (ver 2)",
+      "options": [
+        "Run",
+        "Beauty",
+        "Beautiful",
+        "Running"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "He _____ TV every day. (ver 2)",
+      "options": [
+        "watch",
+        "watching",
+        "watches",
+        "watched"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Which one is the plural form? (ver 2)",
+      "options": [
+        "Cat",
+        "Cats",
+        "Cates",
+        "Cattes"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct preposition: I live ___ Amman. (ver 2)",
+      "options": [
+        "on",
+        "at",
+        "in",
+        "to"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What is the comparative of 'good'? (ver 2)",
+      "options": [
+        "more good",
+        "better",
+        "gooder",
+        "best"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which one is a question word? (ver 2)",
+      "options": [
+        "Why",
+        "Because",
+        "Since",
+        "Then"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Choose the correct spelling: (ver 2)",
+      "options": [
+        "Definately",
+        "Defenetly",
+        "Definitely",
+        "Definitly"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "They ____ to the market yesterday. (ver 2)",
+      "options": [
+        "go",
+        "goes",
+        "went",
+        "gone"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What is the past participle of 'write'? (ver 2)",
+      "options": [
+        "Writed",
+        "Writing",
+        "Written",
+        "Wrote"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Choose the correct modal verb: You ____ study more. (ver 2)",
+      "options": [
+        "must",
+        "might",
+        "can",
+        "shall"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "The sun ____ in the east. (ver 2)",
+      "options": [
+        "rise",
+        "rises",
+        "rising",
+        "rose"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What is the synonym of 'happy'? (ver 3)",
+      "options": [
+        "Sad",
+        "Joyful",
+        "Angry",
+        "Tired"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct sentence: (ver 3)",
+      "options": [
+        "She go to school.",
+        "She goes to school.",
+        "She going to school.",
+        "She gone to school."
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which word is a noun? (ver 3)",
+      "options": [
+        "Quickly",
+        "Running",
+        "Happiness",
+        "Blue"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "I ____ a book now. (ver 3)",
+      "options": [
+        "reads",
+        "am reading",
+        "reading",
+        "readed"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The opposite of 'strong' is: (ver 3)",
+      "options": [
+        "Big",
+        "Fast",
+        "Weak",
+        "Brave"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Choose the past form of 'go': (ver 3)",
+      "options": [
+        "Went",
+        "Goed",
+        "Gone",
+        "Go"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Which sentence is correct? (ver 3)",
+      "options": [
+        "He don't like tea.",
+        "He doesn't likes tea.",
+        "He doesn't like tea.",
+        "He don't likes tea."
+      ],
+      "correct": 2
+    },
+    {
+      "question": "How _____ apples are there? (ver 3)",
+      "options": [
+        "much",
+        "many",
+        "any",
+        "some"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct article: ____ apple (ver 3)",
+      "options": [
+        "a",
+        "an",
+        "the",
+        "no article"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which one is an adjective? (ver 3)",
+      "options": [
+        "Run",
+        "Beauty",
+        "Beautiful",
+        "Running"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "He _____ TV every day. (ver 3)",
+      "options": [
+        "watch",
+        "watching",
+        "watches",
+        "watched"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Which one is the plural form? (ver 3)",
+      "options": [
+        "Cat",
+        "Cats",
+        "Cates",
+        "Cattes"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct preposition: I live ___ Amman. (ver 3)",
+      "options": [
+        "on",
+        "at",
+        "in",
+        "to"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What is the comparative of 'good'? (ver 3)",
+      "options": [
+        "more good",
+        "better",
+        "gooder",
+        "best"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which one is a question word? (ver 3)",
+      "options": [
+        "Why",
+        "Because",
+        "Since",
+        "Then"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Choose the correct spelling: (ver 3)",
+      "options": [
+        "Definately",
+        "Defenetly",
+        "Definitely",
+        "Definitly"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "They ____ to the market yesterday. (ver 3)",
+      "options": [
+        "go",
+        "goes",
+        "went",
+        "gone"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What is the past participle of 'write'? (ver 3)",
+      "options": [
+        "Writed",
+        "Writing",
+        "Written",
+        "Wrote"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Choose the correct modal verb: You ____ study more. (ver 3)",
+      "options": [
+        "must",
+        "might",
+        "can",
+        "shall"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "The sun ____ in the east. (ver 3)",
+      "options": [
+        "rise",
+        "rises",
+        "rising",
+        "rose"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What is the synonym of 'happy'? (ver 4)",
+      "options": [
+        "Sad",
+        "Joyful",
+        "Angry",
+        "Tired"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct sentence: (ver 4)",
+      "options": [
+        "She go to school.",
+        "She goes to school.",
+        "She going to school.",
+        "She gone to school."
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which word is a noun? (ver 4)",
+      "options": [
+        "Quickly",
+        "Running",
+        "Happiness",
+        "Blue"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "I ____ a book now. (ver 4)",
+      "options": [
+        "reads",
+        "am reading",
+        "reading",
+        "readed"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The opposite of 'strong' is: (ver 4)",
+      "options": [
+        "Big",
+        "Fast",
+        "Weak",
+        "Brave"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Choose the past form of 'go': (ver 4)",
+      "options": [
+        "Went",
+        "Goed",
+        "Gone",
+        "Go"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Which sentence is correct? (ver 4)",
+      "options": [
+        "He don't like tea.",
+        "He doesn't likes tea.",
+        "He doesn't like tea.",
+        "He don't likes tea."
+      ],
+      "correct": 2
+    },
+    {
+      "question": "How _____ apples are there? (ver 4)",
+      "options": [
+        "much",
+        "many",
+        "any",
+        "some"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct article: ____ apple (ver 4)",
+      "options": [
+        "a",
+        "an",
+        "the",
+        "no article"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which one is an adjective? (ver 4)",
+      "options": [
+        "Run",
+        "Beauty",
+        "Beautiful",
+        "Running"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "He _____ TV every day. (ver 4)",
+      "options": [
+        "watch",
+        "watching",
+        "watches",
+        "watched"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Which one is the plural form? (ver 4)",
+      "options": [
+        "Cat",
+        "Cats",
+        "Cates",
+        "Cattes"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct preposition: I live ___ Amman. (ver 4)",
+      "options": [
+        "on",
+        "at",
+        "in",
+        "to"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What is the comparative of 'good'? (ver 4)",
+      "options": [
+        "more good",
+        "better",
+        "gooder",
+        "best"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which one is a question word? (ver 4)",
+      "options": [
+        "Why",
+        "Because",
+        "Since",
+        "Then"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Choose the correct spelling: (ver 4)",
+      "options": [
+        "Definately",
+        "Defenetly",
+        "Definitely",
+        "Definitly"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "They ____ to the market yesterday. (ver 4)",
+      "options": [
+        "go",
+        "goes",
+        "went",
+        "gone"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What is the past participle of 'write'? (ver 4)",
+      "options": [
+        "Writed",
+        "Writing",
+        "Written",
+        "Wrote"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Choose the correct modal verb: You ____ study more. (ver 4)",
+      "options": [
+        "must",
+        "might",
+        "can",
+        "shall"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "The sun ____ in the east. (ver 4)",
+      "options": [
+        "rise",
+        "rises",
+        "rising",
+        "rose"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What is the synonym of 'happy'? (ver 5)",
+      "options": [
+        "Sad",
+        "Joyful",
+        "Angry",
+        "Tired"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct sentence: (ver 5)",
+      "options": [
+        "She go to school.",
+        "She goes to school.",
+        "She going to school.",
+        "She gone to school."
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which word is a noun? (ver 5)",
+      "options": [
+        "Quickly",
+        "Running",
+        "Happiness",
+        "Blue"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "I ____ a book now. (ver 5)",
+      "options": [
+        "reads",
+        "am reading",
+        "reading",
+        "readed"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The opposite of 'strong' is: (ver 5)",
+      "options": [
+        "Big",
+        "Fast",
+        "Weak",
+        "Brave"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Choose the past form of 'go': (ver 5)",
+      "options": [
+        "Went",
+        "Goed",
+        "Gone",
+        "Go"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Which sentence is correct? (ver 5)",
+      "options": [
+        "He don't like tea.",
+        "He doesn't likes tea.",
+        "He doesn't like tea.",
+        "He don't likes tea."
+      ],
+      "correct": 2
+    },
+    {
+      "question": "How _____ apples are there? (ver 5)",
+      "options": [
+        "much",
+        "many",
+        "any",
+        "some"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct article: ____ apple (ver 5)",
+      "options": [
+        "a",
+        "an",
+        "the",
+        "no article"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which one is an adjective? (ver 5)",
+      "options": [
+        "Run",
+        "Beauty",
+        "Beautiful",
+        "Running"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "He _____ TV every day. (ver 5)",
+      "options": [
+        "watch",
+        "watching",
+        "watches",
+        "watched"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Which one is the plural form? (ver 5)",
+      "options": [
+        "Cat",
+        "Cats",
+        "Cates",
+        "Cattes"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Choose the correct preposition: I live ___ Amman. (ver 5)",
+      "options": [
+        "on",
+        "at",
+        "in",
+        "to"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What is the comparative of 'good'? (ver 5)",
+      "options": [
+        "more good",
+        "better",
+        "gooder",
+        "best"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which one is a question word? (ver 5)",
+      "options": [
+        "Why",
+        "Because",
+        "Since",
+        "Then"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "Choose the correct spelling: (ver 5)",
+      "options": [
+        "Definately",
+        "Defenetly",
+        "Definitely",
+        "Definitly"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "They ____ to the market yesterday. (ver 5)",
+      "options": [
+        "go",
+        "goes",
+        "went",
+        "gone"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What is the past participle of 'write'? (ver 5)",
+      "options": [
+        "Writed",
+        "Writing",
+        "Written",
+        "Wrote"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Choose the correct modal verb: You ____ study more. (ver 5)",
+      "options": [
+        "must",
+        "might",
+        "can",
+        "shall"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "The sun ____ in the east. (ver 5)",
+      "options": [
+        "rise",
+        "rises",
+        "rising",
+        "rose"
+      ],
+      "correct": 1
+    }
+  ]
+}

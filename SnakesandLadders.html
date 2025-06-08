@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لعبة السلم والحية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --primary-dark: #3a0ca3;
+      --player1-color: #FF5252;
+      --player2-color: #4CAF50;
+      --player3-color: #FFC107;
+      --player4-color: #9C27B0;
+      --error-color: #ef233c;
+      --success-color: #4bb543;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --gray-color: #6c757d;
+      --transition: all 0.3s ease;
+      --obstacle-color: #FF9800;
+      --bonus-color: #00BCD4;
+    }
+    
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: var(--transition);
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      padding: 15px 0;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      flex: 1;
+    }
+
+    .players-info {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      max-width: 800px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .player-card {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      flex: 1;
+      min-width: 150px;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .player-card.active {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      border: 2px solid var(--primary-color);
+    }
+
+    .player1 .player-name { color: var(--player1-color); }
+    .player2 .player-name { color: var(--player2-color); }
+    .player3 .player-name { color: var(--player3-color); }
+    .player4 .player-name { color: var(--player4-color); }
+
+    .player-name {
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .player-position {
+      font-size: 0.9rem;
+      color: var(--gray-color);
+    }
+
+    .player-stats {
+      font-size: 0.8rem;
+      margin-top: 5px;
+      color: var(--gray-color);
+    }
+
+    .board-container {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(10, 1fr);
+      aspect-ratio: 1/1;
+      width: 100%;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #e9ecef;
+      font-weight: 500;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .cell-number {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      font-size: 0.7rem;
+      color: var(--gray-color);
+    }
+
+    .player-token {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      margin: 1px;
+      border: 2px solid white;
+      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+      transition: all 0.5s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .player1-token { background-color: var(--player1-color); }
+    .player2-token { background-color: var(--player2-color); }
+    .player3-token { background-color: var(--player3-color); }
+    .player4-token { background-color: var(--player4-color); }
+
+    .ladder {
+      position: absolute;
+      background-color: rgba(76, 175, 80, 0.3);
+      z-index: 1;
+    }
+
+    .snake {
+      position: absolute;
+      background-color: rgba(239, 35, 60, 0.3);
+      z-index: 1;
+    }
+
+    .obstacle {
+      position: absolute;
+      background-color: rgba(255, 152, 0, 0.3);
+      z-index: 1;
+    }
+
+    .bonus {
+      position: absolute;
+      background-color: rgba(0, 188, 212, 0.3);
+      z-index: 1;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .dice-container {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dice-value {
+      transition: transform 0.5s ease;
+    }
+
+    .dice-rolling {
+      animation: shake 0.5s infinite;
+    }
+
+    @keyframes shake {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(5deg); }
+      50% { transform: rotate(-5deg); }
+      75% { transform: rotate(5deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .dice-container:hover {
+      transform: scale(1.05);
+    }
+
+    .roll-btn {
+      padding: 12px 30px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Tajawal', sans-serif;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .roll-btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .roll-btn:disabled {
+      background-color: var(--gray-color);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .game-log {
+      width: 100%;
+      max-width: 500px;
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 20px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .log-entry {
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 0.9rem;
+    }
+
+    .log-entry.special {
+      color: var(--primary-color);
+      font-weight: 500;
+    }
+
+    .winner-message {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .winner-message.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .winner-message h2 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: white;
+    }
+
+    .winner-message button {
+      padding: 12px 30px;
+      background-color: white;
+      color: var(--primary-color);
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Tajawal', sans-serif;
+      margin-top: 20px;
+    }
+
+    .winner-message button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .setup-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .setup-container {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      color: var(--dark-color);
+    }
+
+    .setup-container h2 {
+      color: var(--primary-color);
+      margin-bottom: 20px;
+    }
+
+    .player-count-selector {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .player-count-btn {
+      padding: 10px 20px;
+      background-color: #e9ecef;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .player-count-btn.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .player-name-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .player-input {
+      display: flex;
+      align-items: center;
+    }
+
+    .player-input label {
+      margin-left: 10px;
+      font-weight: 500;
+      min-width: 70px;
+      text-align: right;
+    }
+
+    .player-input input {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-family: 'Tajawal', sans-serif;
+    }
+
+    .start-game-btn {
+      width: 100%;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Tajawal', sans-serif;
+    }
+
+    .start-game-btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .difficulty-selector {
+      margin-bottom: 25px;
+    }
+
+    .difficulty-options {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .difficulty-btn {
+      padding: 8px 15px;
+      background-color: #e9ecef;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .difficulty-btn.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    /* Dark Mode */
+    body.dark-mode {
+      background-color: #121212;
+      color: #eee;
+    }
+
+    body.dark-mode .player-card,
+    body.dark-mode .game-board,
+    body.dark-mode .dice-container,
+    body.dark-mode .game-log,
+    body.dark-mode .setup-container {
+      background-color: #1e1e1e;
+      color: #eee;
+    }
+
+    body.dark-mode .cell {
+      border-color: #444;
+    }
+
+    body.dark-mode .player-input input {
+      background-color: #2d2d2d;
+      border-color: #444;
+      color: #eee;
+    }
+
+    .toggle-dark {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      color: white;
+      font-size: 1.3rem;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      z-index: 9999;
+      transition: var(--transition);
+    }
+
+    .toggle-dark:hover {
+      transform: scale(1.1);
+    }
+
+    .player-turn-indicator {
+      position: absolute;
+      top: -10px;
+      right: 50%;
+      transform: translateX(50%);
+      width: 20px;
+      height: 20px;
+      background-color: var(--primary-color);
+      border-radius: 50%;
+      display: none;
+    }
+
+    .player-card.active .player-turn-indicator {
+      display: block;
+    }
+
+    /* تحسينات للهواتف */
+    @media (max-width: 576px) {
+      .header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .player-card {
+        min-width: 120px;
+        padding: 10px;
+      }
+      
+      .setup-container {
+        padding: 20px;
+      }
+      
+      .toggle-dark {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+      }
+      
+      .player-count-selector {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .difficulty-options {
+        flex-wrap: wrap;
+      }
+    }
+    
+    /* تحريك الرموز */
+    @keyframes moveToken {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
+    .token-move {
+      animation: moveToken 0.5s ease;
+    }
+    
+    /* تأثيرات خاصة */
+    .snake-effect {
+      animation: snakeShake 0.5s;
+    }
+    
+    @keyframes snakeShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+    
+    .ladder-effect {
+      animation: ladderClimb 0.5s;
+    }
+    
+    @keyframes ladderClimb {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+    
+    /* شريط التقدم */
+    .progress-container {
+      width: 100%;
+      max-width: 500px;
+      margin-top: 15px;
+      background: #e9ecef;
+      border-radius: 10px;
+      height: 10px;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--player1-color), var(--player2-color), var(--player3-color), var(--player4-color));
+      width: 0%;
+      transition: width 1s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- زر تفعيل الوضع الليلي -->
+  <button class="toggle-dark" onclick="toggleDarkMode()" aria-label="تبديل الوضع الليلي">🌓</button>
+
+  <div class="header">
+    <h1>لعبة السلم والحية</h1>
+  </div>
+
+  <div class="game-container">
+    <div class="players-info" id="playersInfo"></div>
+    
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
+    <div class="board-container">
+      <div class="game-board" id="gameBoard"></div>
+    </div>
+    
+    <div class="controls">
+      <div class="dice-container" id="dice">
+        <div class="dice-value" id="diceValue">?</div>
+      </div>
+      <button class="roll-btn" id="rollBtn">رمي النرد</button>
+      
+      <div class="game-log" id="gameLog"></div>
+    </div>
+  </div>
+
+  <div class="winner-message" id="winnerMessage">
+    <h2 id="winnerText"></h2>
+    <div id="winnerStats"></div>
+    <button onclick="resetGame()">لعب مرة أخرى</button>
+  </div>
+
+  <div class="setup-screen" id="setupScreen">
+    <div class="setup-container">
+      <h2>إعدادات اللعبة</h2>
+      
+      <div class="player-count-selector">
+        <button class="player-count-btn active" data-players="2">لاعبين</button>
+        <button class="player-count-btn" data-players="3">3 لاعبين</button>
+        <button class="player-count-btn" data-players="4">4 لاعبين</button>
+      </div>
+      
+      <div class="difficulty-selector">
+        <div>مستوى الصعوبة:</div>
+        <div class="difficulty-options">
+          <button class="difficulty-btn active" data-difficulty="easy">سهل</button>
+          <button class="difficulty-btn" data-difficulty="medium">متوسط</button>
+          <button class="difficulty-btn" data-difficulty="hard">صعب</button>
+        </div>
+      </div>
+      
+      <div class="player-name-inputs" id="playerInputs">
+        <div class="player-input">
+          <input type="text" id="player1Name" placeholder="اسم اللاعب الأول" required>
+          <label for="player1Name">اللاعب 1</label>
+        </div>
+        <div class="player-input">
+          <input type="text" id="player2Name" placeholder="اسم اللاعب الثاني" required>
+          <label for="player2Name">اللاعب 2</label>
+        </div>
+        <div class="player-input" style="display: none;">
+          <input type="text" id="player3Name" placeholder="اسم اللاعب الثالث">
+          <label for="player3Name">اللاعب 3</label>
+        </div>
+        <div class="player-input" style="display: none;">
+          <input type="text" id="player4Name" placeholder="اسم اللاعب الرابع">
+          <label for="player4Name">اللاعب 4</label>
+        </div>
+      </div>
+      
+      <button class="start-game-btn" id="startGameBtn">بدء اللعبة</button>
+    </div>
+  </div>
+
+  <script>
+  // API endpoint
+  const API_BASE = "https://68458d2ffc51878754dba0bb.mockapi.io/games";
+  // التأكد من تسجيل الدخول قبل أي شيء
+const userId = sessionStorage.getItem("userId");
+if (!userId) {
+  alert("🚫 يجب تسجيل الدخول أولاً للعب هذه اللعبة.");
+  window.location.href = "login.html"; // أو مسار صفحة تسجيل الدخول الفعلية
+}
+
+  // حالة اللعبة
+  const gameState = {
+    players: [],
+    currentPlayer: 0,
+    gameStarted: false,
+    gameEnded: false,
+    diceValue: 0,
+    moves: [],
+    boardSize: 100,
+    difficulty: "medium",
+    snakes: [],
+    ladders: [],
+    obstacles: [],
+    bonuses: [],
+    turnCount: 0,
+    lastRoll: 0
+  };
+
+  // عناصر DOM
+  const gameBoard = document.getElementById('gameBoard');
+  const playersInfo = document.getElementById('playersInfo');
+  const dice = document.getElementById('dice');
+  const diceValue = document.getElementById('diceValue');
+  const rollBtn = document.getElementById('rollBtn');
+  const gameLog = document.getElementById('gameLog');
+  const winnerMessage = document.getElementById('winnerMessage');
+  const winnerText = document.getElementById('winnerText');
+  const winnerStats = document.getElementById('winnerStats');
+  const setupScreen = document.getElementById('setupScreen');
+  const playerCountBtns = document.querySelectorAll('.player-count-btn');
+  const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+  const playerInputs = document.getElementById('playerInputs');
+  const startGameBtn = document.getElementById('startGameBtn');
+  const progressBar = document.getElementById('progressBar');
+
+  // تهيئة اللعبة
+  function initGame() {
+    setupScreen.style.display = 'flex';
+    
+    // تحميل أي بيانات محفوظة
+    const savedGame = localStorage.getItem('snakesAndLaddersGame');
+    if (savedGame) {
+      const parsedGame = JSON.parse(savedGame);
+      if (confirm('هل تريد استئناف اللعبة السابقة؟')) {
+        Object.assign(gameState, parsedGame);
+        startGame();
+      }
+    }
+  }
+
+  // بدء اللعبة
+  function startGame() {
+    setupScreen.style.display = 'none';
+    gameState.gameStarted = true;
+    gameState.gameEnded = false;
+    gameState.turnCount = 0;
+    
+    // إنشاء اللاعبين إذا لم يكونوا موجودين
+    if (gameState.players.length === 0) {
+      const playerCount = document.querySelector('.player-count-btn.active').dataset.players;
+      gameState.difficulty = document.querySelector('.difficulty-btn.active').dataset.difficulty;
+      
+      gameState.players = [
+        { 
+          id: 1, 
+          name: document.getElementById('player1Name').value || 'اللاعب 1', 
+          position: 0, 
+          color: 'player1',
+          rolls: [],
+          snakes: 0,
+          ladders: 0,
+          obstacles: 0,
+          bonuses: 0
+        },
+        { 
+          id: 2, 
+          name: document.getElementById('player2Name').value || 'اللاعب 2', 
+          position: 0, 
+          color: 'player2',
+          rolls: [],
+          snakes: 0,
+          ladders: 0,
+          obstacles: 0,
+          bonuses: 0
+        }
+      ];
+      
+      if (playerCount >= '3') {
+        gameState.players.push({ 
+          id: 3, 
+          name: document.getElementById('player3Name').value || 'اللاعب 3', 
+          position: 0, 
+          color: 'player3',
+          rolls: [],
+          snakes: 0,
+          ladders: 0,
+          obstacles: 0,
+          bonuses: 0
+        });
+      }
+      
+      if (playerCount === '4') {
+        gameState.players.push({ 
+          id: 4, 
+          name: document.getElementById('player4Name').value || 'اللاعب 4', 
+          position: 0, 
+          color: 'player4',
+          rolls: [],
+          snakes: 0,
+          ladders: 0,
+          obstacles: 0,
+          bonuses: 0
+        });
+      }
+    }
+    
+    // إنشاء العقبات والسلالم والثعابين حسب مستوى الصعوبة
+    setupBoardDifficulty();
+    
+    // إنشاء لوحة اللعبة
+    createBoard();
+    updatePlayersInfo();
+    renderPlayers();
+    updateProgressBar();
+    addLogEntry('بدأت اللعبة!', 'special');
+    
+    // حفظ حالة اللعبة
+    saveGameState();
+  }
+
+  // إعداد الصعوبة
+  function setupBoardDifficulty() {
+    // مسح العقبات القديمة
+    gameState.snakes = [];
+    gameState.ladders = [];
+    gameState.obstacles = [];
+    gameState.bonuses = [];
+    
+    // الثعابين الأساسية
+    const baseSnakes = [
+      { from: 98, to: 78 },
+      { from: 95, to: 75 },
+      { from: 62, to: 19 },
+      { from: 54, to: 34 },
+      { from: 17, to: 7 }
+    ];
+    
+    // السلالم الأساسية
+    const baseLadders = [
+      { from: 80, to: 99 },
+      { from: 72, to: 91 },
+      { from: 51, to: 67 },
+      { from: 28, to: 84 },
+      { from: 4, to: 14 }
+    ];
+    
+    // إضافة الثعابين والسلالم حسب الصعوبة
+    gameState.snakes = [...baseSnakes];
+    gameState.ladders = [...baseLadders];
+    
+    if (gameState.difficulty === 'easy') {
+      // إضافة سلالم إضافية وتقليل الثعابين
+      gameState.ladders.push(
+        { from: 35, to: 45 },
+        { from: 22, to: 33 }
+      );
+      gameState.snakes = gameState.snakes.slice(0, 3);
+      
+      // عقبات قليلة
+      gameState.obstacles = [25, 50, 75];
+      gameState.bonuses = [10, 30, 60, 90];
+    } 
+    else if (gameState.difficulty === 'medium') {
+      // إضافة بعض العقبات والمكافآت
+      gameState.obstacles = [15, 30, 45, 60, 85];
+      gameState.bonuses = [5, 20, 40, 70, 95];
+    } 
+    else if (gameState.difficulty === 'hard') {
+      // الكثير من الثعابين والعقبات
+      gameState.snakes.push(
+        { from: 88, to: 68 },
+        { from: 65, to: 45 },
+        { from: 42, to: 22 },
+        { from: 38, to: 18 }
+      );
+      
+      gameState.obstacles = [12, 24, 36, 48, 60, 72, 84, 96];
+      gameState.bonuses = [6, 18, 42, 66, 90];
+    }
+  }
+
+  // إنشاء لوحة اللعبة
+  function createBoard() {
+    gameBoard.innerHTML = '';
+    
+    // إنشاء الخلايا (من 100 إلى 1 بطريقة متعرجة)
+    let counter = 100;
+    for (let row = 0; row < 10; row++) {
+      const isReverse = row % 2 !== 0;
+      
+      for (let col = 0; col < 10; col++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.number = counter;
+        
+        const cellNumber = document.createElement('div');
+        cellNumber.className = 'cell-number';
+        cellNumber.textContent = counter;
+        cell.appendChild(cellNumber);
+        
+        gameBoard.appendChild(cell);
+        counter += isReverse ? 1 : -1;
+      }
+      
+      counter -= isReverse ? 11 : 9;
+    }
+    
+    // إضافة السلالم والثعابين والعقبات
+    addSnakesAndLadders();
+    addObstaclesAndBonuses();
+  }
+
+  // إضافة السلالم والثعابين
+  function addSnakesAndLadders() {
+    gameState.snakes.forEach(snake => {
+      const fromCell = document.querySelector(`.cell[data-number="${snake.from}"]`);
+      const toCell = document.querySelector(`.cell[data-number="${snake.to}"]`);
+      
+      if (fromCell && toCell) {
+        const fromRect = fromCell.getBoundingClientRect();
+        const toRect = toCell.getBoundingClientRect();
+        
+        const snakeElement = document.createElement('div');
+        snakeElement.className = 'snake';
+        
+        // حساب موقع الخط بين الخليتين
+        const left = Math.min(fromRect.left, toRect.left) - gameBoard.getBoundingClientRect().left;
+        const top = Math.min(fromRect.top, toRect.top) - gameBoard.getBoundingClientRect().top;
+        const width = Math.abs(fromRect.left - toRect.left) + fromRect.width;
+        const height = Math.abs(fromRect.top - toRect.top) + fromRect.height;
+        
+        snakeElement.style.left = `${left}px`;
+        snakeElement.style.top = `${top}px`;
+        snakeElement.style.width = `${width}px`;
+        snakeElement.style.height = `${height}px`;
+        
+        gameBoard.appendChild(snakeElement);
+        
+        // إضافة أيقونة ثعبان
+        const snakeIcon = document.createElement('i');
+        snakeIcon.className = 'fas fa-skull';
+        snakeIcon.style.position = 'absolute';
+        snakeIcon.style.right = '5px';
+        snakeIcon.style.bottom = '5px';
+        snakeIcon.style.color = 'var(--error-color)';
+        snakeIcon.style.fontSize = '0.8rem';
+        fromCell.appendChild(snakeIcon);
+      }
+    });
+    
+    gameState.ladders.forEach(ladder => {
+      const fromCell = document.querySelector(`.cell[data-number="${ladder.from}"]`);
+      const toCell = document.querySelector(`.cell[data-number="${ladder.to}"]`);
+      
+      if (fromCell && toCell) {
+        const fromRect = fromCell.getBoundingClientRect();
+        const toRect = toCell.getBoundingClientRect();
+        
+        const ladderElement = document.createElement('div');
+        ladderElement.className = 'ladder';
+        
+        // حساب موقع الخط بين الخليتين
+        const left = Math.min(fromRect.left, toRect.left) - gameBoard.getBoundingClientRect().left;
+        const top = Math.min(fromRect.top, toRect.top) - gameBoard.getBoundingClientRect().top;
+        const width = Math.abs(fromRect.left - toRect.left) + fromRect.width;
+        const height = Math.abs(fromRect.top - toRect.top) + fromRect.height;
+        
+        ladderElement.style.left = `${left}px`;
+        ladderElement.style.top = `${top}px`;
+        ladderElement.style.width = `${width}px`;
+        ladderElement.style.height = `${height}px`;
+        
+        gameBoard.appendChild(ladderElement);
+        
+        // إضافة أيقونة سلم
+        const ladderIcon = document.createElement('i');
+        ladderIcon.className = 'fas fa-arrow-up';
+        ladderIcon.style.position = 'absolute';
+        ladderIcon.style.right = '5px';
+        ladderIcon.style.bottom = '5px';
+        ladderIcon.style.color = 'var(--success-color)';
+        ladderIcon.style.fontSize = '0.8rem';
+        fromCell.appendChild(ladderIcon);
+      }
+    });
+  }
+
+  // إضافة العقبات والمكافآت
+  function addObstaclesAndBonuses() {
+    gameState.obstacles.forEach(pos => {
+      const cell = document.querySelector(`.cell[data-number="${pos}"]`);
+      if (cell) {
+        const obstacleElement = document.createElement('div');
+        obstacleElement.className = 'obstacle';
+        obstacleElement.style.width = '100%';
+        obstacleElement.style.height = '100%';
+        cell.appendChild(obstacleElement);
+        
+        // إضافة أيقونة عقبة
+        const obstacleIcon = document.createElement('i');
+        obstacleIcon.className = 'fas fa-times-circle';
+        obstacleIcon.style.position = 'absolute';
+        obstacleIcon.style.left = '5px';
+        obstacleIcon.style.bottom = '5px';
+        obstacleIcon.style.color = 'var(--obstacle-color)';
+        obstacleIcon.style.fontSize = '0.8rem';
+        cell.appendChild(obstacleIcon);
+      }
+    });
+    
+    gameState.bonuses.forEach(pos => {
+      const cell = document.querySelector(`.cell[data-number="${pos}"]`);
+      if (cell) {
+        const bonusElement = document.createElement('div');
+        bonusElement.className = 'bonus';
+        bonusElement.style.width = '100%';
+        bonusElement.style.height = '100%';
+        cell.appendChild(bonusElement);
+        
+        // إضافة أيقونة مكافأة
+        const bonusIcon = document.createElement('i');
+        bonusIcon.className = 'fas fa-star';
+        bonusIcon.style.position = 'absolute';
+        bonusIcon.style.left = '5px';
+        bonusIcon.style.bottom = '5px';
+        bonusIcon.style.color = 'var(--bonus-color)';
+        bonusIcon.style.fontSize = '0.8rem';
+        cell.appendChild(bonusIcon);
+      }
+    });
+  }
+
+  // تحديث معلومات اللاعبين
+  function updatePlayersInfo() {
+    playersInfo.innerHTML = '';
+    
+    gameState.players.forEach((player, index) => {
+      const playerCard = document.createElement('div');
+      playerCard.className = `player-card player${player.id} ${index === gameState.currentPlayer ? 'active' : ''}`;
+      
+      const turnIndicator = document.createElement('div');
+      turnIndicator.className = 'player-turn-indicator';
+      playerCard.appendChild(turnIndicator);
+      
+      playerCard.innerHTML += `
+        <div class="player-name">${player.name}</div>
+        <div class="player-position">الموقع: ${player.position}</div>
+        <div class="player-stats">
+          <span title="عدد المرات التي صعد فيها سلم"><i class="fas fa-arrow-up" style="color: var(--success-color)"></i> ${player.ladders}</span> | 
+          <span title="عدد المرات التي وقع فيها في ثعبان"><i class="fas fa-arrow-down" style="color: var(--error-color)"></i> ${player.snakes}</span>
+        </div>
+      `;
+      
+      playersInfo.appendChild(playerCard);
+    });
+  }
+
+  // عرض اللاعبين على اللوحة
+  function renderPlayers() {
+    // مسح جميع الرموز السابقة
+    document.querySelectorAll('.player-token').forEach(token => token.remove());
+    
+    gameState.players.forEach(player => {
+      if (player.position > 0) {
+        const cell = document.querySelector(`.cell[data-number="${player.position}"]`);
+        if (cell) {
+          const token = document.createElement('div');
+          token.className = `player-token player${player.id}-token`;
+          
+          // إضافة رقم اللاعب على الرمز
+          const playerNumber = document.createElement('span');
+          playerNumber.textContent = player.id;
+          playerNumber.style.color = 'white';
+          playerNumber.style.fontSize = '0.7rem';
+          playerNumber.style.position = 'absolute';
+          playerNumber.style.top = '50%';
+          playerNumber.style.left = '50%';
+          playerNumber.style.transform = 'translate(-50%, -50%)';
+          token.appendChild(playerNumber);
+          
+          cell.appendChild(token);
+          
+          // تأثير الحركة
+          setTimeout(() => {
+            token.classList.add('token-move');
+            setTimeout(() => token.classList.remove('token-move'), 500);
+          }, 10);
+        }
+      }
+    });
+  }
+
+  // تحديث شريط التقدم
+  function updateProgressBar() {
+    const totalProgress = gameState.players.reduce((sum, player) => sum + player.position, 0);
+    const maxPossible = gameState.players.length * gameState.boardSize;
+    const progressPercentage = (totalProgress / maxPossible) * 100;
+    
+    progressBar.style.width = `${progressPercentage}%`;
+  }
+
+  // رمي النرد
+  async function rollDice() {
+    if (gameState.gameEnded) return;
+    
+    rollBtn.disabled = true;
+    diceValue.textContent = '...';
+    dice.classList.add('dice-rolling');
+    gameState.lastRoll = 0;
+    
+    // تأثير رمي النرد
+    let rolls = 0;
+    const rollInterval = setInterval(() => {
+      gameState.diceValue = Math.floor(Math.random() * 6) + 1;
+      diceValue.textContent = gameState.diceValue;
+      gameState.lastRoll = gameState.diceValue;
+      rolls++;
+      
+      if (rolls > 10) {
+        clearInterval(rollInterval);
+        dice.classList.remove('dice-rolling');
+        
+        // تحريك اللاعب خطوة بخطوة
+        movePlayerStepByStep();
+      }
+    }, 100);
+  }
+
+  // تحريك اللاعب خطوة بخطوة
+  function movePlayerStepByStep() {
+    const currentPlayer = gameState.players[gameState.currentPlayer];
+    let stepsRemaining = gameState.diceValue;
+    let currentStep = 0;
+    
+    addLogEntry(`${currentPlayer.name} رمى ${gameState.diceValue}`);
+    currentPlayer.rolls.push(gameState.diceValue);
+    
+    const moveInterval = setInterval(() => {
+      if (stepsRemaining <= 0) {
+        clearInterval(moveInterval);
+        
+        // التحقق من وجود ثعبان أو سلم أو عقبة أو مكافأة
+        checkSpecialCells(currentPlayer);
+        
+        // التحقق من الفوز
+        if (currentPlayer.position === gameState.boardSize) {
+          endGame(currentPlayer);
+          return;
+        }
+        
+        // الانتقال للاعب التالي بعد تأخير قصير
+        setTimeout(() => {
+          nextPlayer();
+        }, 1000);
+        
+        return;
+      }
+      
+      // التحرك خطوة واحدة
+      currentPlayer.position++;
+      currentStep++;
+      stepsRemaining--;
+      
+      // تحديث العرض
+      updatePlayersInfo();
+      renderPlayers();
+      updateProgressBar();
+      
+      // إضافة صوت للخطوة (يمكن تفعيله إذا أردت)
+      // if (currentStep < gameState.diceValue) {
+      //   const stepSound = new Audio('step-sound.mp3');
+      //   stepSound.play();
+      // }
+      
+    }, 500); // تأخير 500 مللي ثانية بين كل خطوة
+  }
+
+  // التحقق من وجود ثعبان أو سلم أو عقبة أو مكافأة
+  function checkSpecialCells(player) {
+    // التحقق من الثعابين
+    const snake = gameState.snakes.find(s => s.from === player.position);
+    if (snake) {
+      player.position = snake.to;
+      player.snakes++;
+      addLogEntry(`أوه لا! ${player.name} وقع على ثعبان وينزل إلى المربع ${snake.to}`, 'special');
+      
+      // تأثير الثعبان
+      const token = document.querySelector(`.cell[data-number="${player.position}"] .player-token`);
+      if (token) token.classList.add('snake-effect');
+      return;
+    }
+    
+    // التحقق من السلالم
+    const ladder = gameState.ladders.find(l => l.from === player.position);
+    if (ladder) {
+      player.position = ladder.to;
+      player.ladders++;
+      addLogEntry(`رائع! ${player.name} صعد سلم إلى المربع ${ladder.to}`, 'special');
+      
+      // تأثير السلم
+      const token = document.querySelector(`.cell[data-number="${player.position}"] .player-token`);
+      if (token) token.classList.add('ladder-effect');
+      return;
+    }
+    
+    // التحقق من العقبات
+    const obstacle = gameState.obstacles.find(o => o === player.position);
+    if (obstacle) {
+      const penalty = Math.max(1, Math.floor(gameState.lastRoll / 2)); // عقوبة من 1 إلى 3 خطوات للخلف
+      player.position = Math.max(1, player.position - penalty);
+      player.obstacles++;
+      addLogEntry(`!${player.name} واجه عقبة ويعود ${penalty} خطوة إلى المربع ${player.position}`, 'special');
+      return;
+    }
+    
+    // التحقق من المكافآت
+    const bonus = gameState.bonuses.find(b => b === player.position);
+    if (bonus) {
+      const reward = Math.max(1, Math.floor(gameState.lastRoll / 2)); // مكافأة من 1 إلى 3 خطوات للأمام
+      player.position = Math.min(gameState.boardSize, player.position + reward);
+      player.bonuses++;
+      addLogEntry(`!${player.name} حصل على مكافأة ويتقدم ${reward} خطوة إلى المربع ${player.position}`, 'special');
+      return;
+    }
+    
+    // التحقق إذا كان اللاعب تجاوز المربع 100
+    if (player.position > gameState.boardSize) {
+      const overshoot = player.position - gameState.boardSize;
+      player.position = gameState.boardSize - overshoot;
+      addLogEntry(`${player.name} تجاوز المربع 100 ويعود ${overshoot} خطوة إلى المربع ${player.position}`);
+    }
+  }
+
+  // الانتقال للاعب التالي
+  function nextPlayer() {
+    gameState.currentPlayer = (gameState.currentPlayer + 1) % gameState.players.length;
+    gameState.turnCount++;
+    updatePlayersInfo();
+    rollBtn.disabled = false;
+    
+    // إذا كان اللاعب قد حصل على 6، يحصل على دور إضافي
+    const currentPlayer = gameState.players[gameState.currentPlayer];
+    if (gameState.lastRoll === 6) {
+      addLogEntry(`!${currentPlayer.name} يحصل على دور إضافي لأنه حصل على 6`);
+      rollBtn.disabled = false;
+    }
+    
+    // حفظ حالة اللعبة
+    saveGameState();
+  }
+
+  // إنهاء اللعبة
+  function endGame(winner) {
+    gameState.gameEnded = true;
+    winnerText.textContent = `مبروك! ${winner.name} فاز باللعبة!`;
+    
+    // إحصائيات الفائز
+    const averageRoll = (winner.rolls.reduce((a, b) => a + b, 0) / winner.rolls.length).toFixed(1);
+    const totalSnakes = winner.snakes;
+    const totalLadders = winner.ladders;
+    
+    winnerStats.innerHTML = `
+      <p>عدد الأدوار: ${gameState.turnCount}</p>
+      <p>متوسط رميات النرد: ${averageRoll}</p>
+      <p>صعد ${totalLadders} سلالم ووقع في ${totalSnakes} ثعابين</p>
+    `;
+    
+    winnerMessage.classList.add('show');
+    
+    // تسجيل النتيجة في localStorage
+const gameResult = {
+  winner: winner.name,
+  players: gameState.players.map(p => ({
+    name: p.name, 
+    finalPosition: p.position,
+    rolls: p.rolls.length,
+    averageRoll: (p.rolls.reduce((a, b) => a + b, 0) / p.rolls.length) || 0,
+    snakes: p.snakes,
+    ladders: p.ladders
+  })),
+  date: new Date().toLocaleString(),
+  moves: gameState.moves,
+  difficulty: gameState.difficulty,
+  duration: gameState.turnCount
+};
+    
+    // حفظ في localStorage
+    const gameHistory = JSON.parse(localStorage.getItem('snakesAndLaddersHistory') || '[]');
+    gameHistory.unshift(gameResult);
+    localStorage.setItem('snakesAndLaddersHistory', JSON.stringify(gameHistory));
+    
+    // إرسال النتيجة إلى API (إذا كان متاحًا)
+    sendGameResult(gameResult);
+    
+    // مسح حالة اللعبة الحالية
+    localStorage.removeItem('snakesAndLaddersGame');
+  }
+
+  // إعادة تعيين اللعبة
+  function resetGame() {
+    winnerMessage.classList.remove('show');
+    
+    // إعادة تعيين حالة اللعبة
+    gameState.players.forEach(player => {
+      player.position = 0;
+      player.rolls = [];
+      player.snakes = 0;
+      player.ladders = 0;
+      player.obstacles = 0;
+      player.bonuses = 0;
+    });
+    
+    gameState.currentPlayer = 0;
+    gameState.gameEnded = false;
+    gameState.moves = [];
+    gameState.turnCount = 0;
+    gameState.lastRoll = 0;
+    
+    // تحديث العرض
+    updatePlayersInfo();
+    renderPlayers();
+    updateProgressBar();
+    gameLog.innerHTML = '';
+    diceValue.textContent = '?';
+    rollBtn.disabled = false;
+    
+    // حفظ حالة اللعبة
+    saveGameState();
+  }
+
+  // حفظ حالة اللعبة
+  function saveGameState() {
+    localStorage.setItem('snakesAndLaddersGame', JSON.stringify(gameState));
+  }
+
+  // إرسال نتيجة اللعبة إلى API
+// إرسال نتيجة اللعبة إلى MockAPI وربطها بالمستخدم
+async function sendGameResult(result) {
+  if (!userId) return; // تأكيد إضافي
+
+  try {
+    const response = await fetch(API_BASE, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...result,
+        userId: userId
+      })
+    });
+
+    if (!response.ok) throw new Error('فشل في حفظ النتيجة');
+
+    const data = await response.json();
+    console.log('✅ تم حفظ النتيجة في MockAPI:', data);
+  } catch (error) {
+    console.error('❌ خطأ في حفظ النتيجة:', error);
+  }
+}
+
+
+  // إضافة مدخل إلى سجل اللعبة
+  function addLogEntry(text, className = '') {
+    const entry = document.createElement('div');
+    entry.className = `log-entry ${className}`;
+    entry.textContent = text;
+    gameLog.prepend(entry);
+    
+    // حفظ الحركة
+    gameState.moves.push({
+      player: gameState.players[gameState.currentPlayer].name,
+      move: text,
+      timestamp: new Date().toLocaleTimeString()
+    });
+    
+    // التمرير إلى الأعلى تلقائياً
+    gameLog.scrollTop = 0;
+  }
+
+  // تبديل الوضع الليلي
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+    document.querySelector('.toggle-dark').innerHTML = document.body.classList.contains("dark-mode") ? '☀️' : '🌓';
+  }
+
+  // تهيئة الصفحة
+  window.addEventListener('DOMContentLoaded', () => {
+    // تهيئة الوضع الليلي
+    if (localStorage.getItem("theme") === "dark") {
+      document.body.classList.add("dark-mode");
+      document.querySelector('.toggle-dark').innerHTML = '☀️';
+    }
+    
+    // أحداث اختيار عدد اللاعبين
+    playerCountBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        playerCountBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // إظهار/إخفاء حقول اللاعبين الإضافية
+        const playerInputs = document.querySelectorAll('.player-input');
+        playerInputs.forEach((input, index) => {
+          if (index >= 2) {
+            input.style.display = index < parseInt(btn.dataset.players) ? 'flex' : 'none';
+          }
+        });
+      });
+    });
+    
+    // أحداث اختيار مستوى الصعوبة
+    difficultyBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        difficultyBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        gameState.difficulty = btn.dataset.difficulty;
+      });
+    });
+    
+    // حدث بدء اللعبة
+    startGameBtn.addEventListener('click', () => {
+      const player1Name = document.getElementById('player1Name').value.trim();
+      const player2Name = document.getElementById('player2Name').value.trim();
+      
+      if (!player1Name || !player2Name) {
+        alert('الرجاء إدخال أسماء اللاعبين الأساسيين');
+        return;
+      }
+      
+      const playerCount = document.querySelector('.player-count-btn.active').dataset.players;
+      if (playerCount >= '3') {
+        const player3Name = document.getElementById('player3Name').value.trim();
+        if (!player3Name) {
+          alert('الرجاء إدخال اسم اللاعب الثالث');
+          return;
+        }
+      }
+      
+      if (playerCount === '4') {
+        const player4Name = document.getElementById('player4Name').value.trim();
+        if (!player4Name) {
+          alert('الرجاء إدخال اسم اللاعب الرابع');
+          return;
+        }
+      }
+      
+      startGame();
+    });
+    
+    // حدث رمي النرد
+    rollBtn.addEventListener('click', rollDice);
+    
+    // تهيئة اللعبة
+    initGame();
+  });
+  </script>
+
+</body>
+</html>

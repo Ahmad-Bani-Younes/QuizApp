@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <title>لعبة الهروب</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .game {
+      width: 800px;
+      height: 300px;
+      border: 3px solid #000;
+      background-color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .character {
+      width: 50px;
+      height: 50px;
+      background-color: green;
+      position: absolute;
+      bottom: 0;
+      left: 50px;
+    }
+
+    .obstacle {
+      position: absolute;
+      bottom: 0;
+      animation: move 2s linear infinite;
+    }
+
+    @keyframes move {
+      0% { left: 800px; }
+      100% { left: -60px; }
+    }
+
+    .jump {
+      animation: jump 0.5s ease-out;
+    }
+
+    @keyframes jump {
+      0%   { bottom: 0; }
+      50%  { bottom: 120px; }
+      100% { bottom: 0; }
+    }
+
+    .score, .timer, .lives, .high-score {
+      position: absolute;
+      top: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .score { left: 10px; }
+    .timer { right: 10px; }
+    .lives {
+      top: 40px;
+      left: 10px;
+      color: red;
+    }
+    .high-score {
+      top: 70px;
+      left: 10px;
+      color: #333;
+    }
+
+    .pause-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      padding: 6px 12px;
+      font-size: 16px;
+      background-color: #0d47a1;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<audio id="jump-sound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
+<audio id="fail-sound" src="https://www.soundjay.com/button/beep-07.mp3"></audio>
+<audio id="bg-music" src="https://www.bensound.com/bensound-music/bensound-littleidea.mp3" loop></audio>
+
+<div class="game" id="game">
+  <div class="score" id="score">النتيجة: 0</div>
+  <div class="timer" id="timer">⏱ الوقت: 0 ثانية</div>
+  <div class="lives" id="lives">❤️❤️❤️</div>
+  <div class="high-score" id="highScore">🏆 أعلى نتيجة: --</div>
+  <div class="character" id="character"></div>
+  <button class="pause-btn" onclick="togglePause()">⏸️</button>
+</div>
+
+<script>
+  const game = document.getElementById("game");
+  const character = document.getElementById("character");
+  const scoreEl = document.getElementById("score");
+  const timerEl = document.getElementById("timer");
+  const livesEl = document.getElementById("lives");
+  const highScoreEl = document.getElementById("highScore");
+  const jumpSound = document.getElementById("jump-sound");
+  const failSound = document.getElementById("fail-sound");
+  const bgMusic = document.getElementById("bg-music");
+
+  let score = 0;
+  let lives = 3;
+  let isAlive = true;
+  let secondsPassed = 0;
+  let isPaused = false;
+
+  let spawnInterval, gameInterval, timerInterval;
+
+  // تحميل أعلى نتيجة من التخزين
+  const storedHigh = JSON.parse(localStorage.getItem("highScore")) || { score: 0, time: 0 };
+  highScoreEl.textContent = `🏆 أعلى نتيجة: ${storedHigh.score} (${storedHigh.time}ث)`;
+
+  // Timer
+  timerInterval = setInterval(() => {
+    if (isAlive && !isPaused) {
+      secondsPassed++;
+      timerEl.textContent = `⏱ الوقت: ${secondsPassed} ثانية`;
+    }
+  }, 1000);
+
+  // Jump
+  document.addEventListener("keydown", function(event) {
+    if ((event.code === "Space" || event.key === " ") && isAlive && !isPaused) {
+      if (!character.classList.contains("jump")) {
+        character.classList.add("jump");
+        jumpSound.play();
+        setTimeout(() => {
+          character.classList.remove("jump");
+        }, 500);
+      }
+    }
+  });
+
+  function createObstacle() {
+    const obstacle = document.createElement("div");
+    obstacle.classList.add("obstacle");
+
+    const size = Math.floor(Math.random() * 30) + 30;
+    obstacle.style.width = size + "px";
+    obstacle.style.height = size + "px";
+
+    const colors = ["red", "blue", "purple", "orange", "black"];
+    obstacle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    obstacle.style.left = "800px";
+
+    game.appendChild(obstacle);
+
+    obstacle.addEventListener("animationiteration", () => {
+      game.removeChild(obstacle);
+    });
+
+    return obstacle;
+  }
+
+  function checkCollision(obstacle) {
+    const charRect = character.getBoundingClientRect();
+    const obsRect = obstacle.getBoundingClientRect();
+
+    return !(
+      charRect.top > obsRect.bottom ||
+      charRect.bottom < obsRect.top ||
+      charRect.right < obsRect.left ||
+      charRect.left > obsRect.right
+    );
+  }
+
+  <!-- داخل loseLife() -->
+function loseLife() {
+  lives--;
+  failSound.play();
+  livesEl.textContent = "❤️".repeat(lives);
+
+  if (lives === 0) {
+    isAlive = false;
+    bgMusic.pause();
+
+    // حفظ الأعلى
+    if (score > storedHigh.score) {
+      localStorage.setItem("highScore", JSON.stringify({ score: score, time: secondsPassed }));
+    }
+
+    // حفظ النتيجة الحالية
+    sessionStorage.setItem("lastScore", score);
+    sessionStorage.setItem("lastTime", secondsPassed);
+
+    // الانتقال لصفحة النتيجة
+    window.location.href = "game-over.html";
+  }
+}
+
+
+  function startGameLoop() {
+    const obstacles = [];
+
+    spawnInterval = setInterval(() => {
+      if (!isAlive || isPaused) return;
+      const obs = createObstacle();
+      obstacles.push(obs);
+    }, 1500);
+
+    gameInterval = setInterval(() => {
+      if (!isAlive || isPaused) return;
+
+      obstacles.forEach(obs => {
+        if (checkCollision(obs)) {
+          loseLife();
+          game.removeChild(obs);
+        }
+      });
+
+      score++;
+      scoreEl.textContent = `النتيجة: ${score}`;
+    }, 100);
+  }
+
+  function togglePause() {
+    isPaused = !isPaused;
+    document.querySelector(".pause-btn").textContent = isPaused ? "▶️" : "⏸️";
+    if (isPaused) {
+      bgMusic.pause();
+    } else {
+      bgMusic.play();
+    }
+  }
+
+  // Start everything
+  bgMusic.play();
+  startGameLoop();
+</script>
+
+</body>
+</html>

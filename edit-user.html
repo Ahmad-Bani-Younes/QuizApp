@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تعديل مستخدم</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4f46e5;
+      --secondary-color: #4338ca;
+      --accent-color: #6366f1;
+      --danger-color: #ef4444;
+      --success-color: #10b981;
+      --light-color: #f9fafb;
+      --dark-color: #111827;
+      --gray-color: #6b7280;
+      --border-radius: 10px;
+      --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Tajawal', Arial, sans-serif;
+    }
+    
+    body {
+      background-color: #f3f4f6;
+      color: var(--dark-color);
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+    }
+    
+    .user-card {
+      background-color: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 30px;
+      transition: var(--transition);
+    }
+    
+    .user-card:hover {
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+    }
+    
+    .card-header h2 {
+      color: var(--primary-color);
+      font-size: 28px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .card-header::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 3px;
+      background: var(--accent-color);
+      margin: 15px auto;
+      border-radius: 3px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--dark-color);
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #e5e7eb;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      transition: var(--transition);
+      background-color: #f9fafb;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+      background-color: white;
+    }
+    
+    .form-control:disabled {
+      background-color: #f3f4f6;
+      color: var(--gray-color);
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+    
+    .btn-block {
+      display: block;
+      width: 100%;
+    }
+    
+    .user-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: var(--accent-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: bold;
+      margin: 0 auto 15px;
+    }
+    
+    /* Dark Mode Styles */
+    body.dark-mode {
+      background-color: #1f2937;
+      color: #f9fafb;
+    }
+    
+    body.dark-mode .user-card {
+      background-color: #111827;
+      color: #f9fafb;
+    }
+    
+    body.dark-mode .form-control {
+      background-color: #1f2937;
+      color: #f9fafb;
+      border-color: #374151;
+    }
+    
+    body.dark-mode .form-control:focus {
+      background-color: #1f2937;
+    }
+    
+    body.dark-mode .form-control:disabled {
+      background-color: #1f2937;
+      color: #9ca3af;
+    }
+    
+    body.dark-mode .form-group label {
+      color: #f9fafb;
+    }
+    
+    /* Toggle Button */
+    .toggle-dark {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: var(--dark-color);
+      color: white;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .user-card {
+      animation: fadeIn 0.5s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="user-card">
+      <div class="card-header">
+        <div class="user-avatar">
+          <i class="fas fa-user-edit"></i>
+        </div>
+        <h2><i class="fas fa-user-cog"></i> تعديل بيانات المستخدم</h2>
+        <p>قم بتعديل المعلومات الأساسية للمستخدم</p>
+      </div>
+      
+      <form id="editUserForm" onsubmit="saveUser(event)">
+        <div class="form-group">
+          <label for="name"><i class="fas fa-user"></i> الاسم الكامل</label>
+          <input type="text" id="name" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="email"><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+          <input type="email" id="email" class="form-control" disabled>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone"><i class="fas fa-phone"></i> رقم الهاتف</label>
+          <input type="tel" id="phone" class="form-control">
+        </div>
+        
+        <div class="form-group">
+          <label for="role"><i class="fas fa-user-tag"></i> الدور</label>
+          <select id="role" class="form-control" required>
+            <option value="user">مستخدم عادي</option>
+            <option value="admin">مسؤول النظام</option>
+          </select>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-block">
+          <i class="fas fa-save"></i> حفظ التعديلات
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- زر الوضع الليلي -->
+  <button class="toggle-dark" onclick="toggleDarkMode()">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <script>
+  const API_URL = 'https://6844373271eb5d1be032b52a.mockapi.io/users';
+  const userId = sessionStorage.getItem("editUserId");
+
+  if (!userId) {
+    alert("لم يتم تحديد مستخدم");
+    window.location.href = "admin.html";
+  }
+
+  async function fetchUser() {
+    try {
+      const res = await fetch(`${API_URL}/${userId}`);
+      if (!res.ok) throw new Error("فشل في تحميل بيانات المستخدم");
+      return await res.json();
+    } catch (err) {
+      alert("فشل تحميل بيانات المستخدم");
+      window.location.href = "admin.html";
+    }
+  }
+
+  async function populateForm() {
+    const user = await fetchUser();
+    if (!user) return;
+
+    document.getElementById("name").value = user.name || "";
+    document.getElementById("email").value = user.email || "";
+    document.getElementById("phone").value = user.phone || "";
+    document.getElementById("role").value = user.role || "user";
+
+    const avatar = document.querySelector('.user-avatar');
+    avatar.innerHTML = `<span>${user.name?.charAt(0).toUpperCase() || "U"}</span>`;
+  }
+
+async function saveUser(event) {
+  event.preventDefault();
+
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const role = document.getElementById("role").value;
+
+  const phoneRegex = /^07[789]\d{7}$/;
+
+  if (!name || !email || !phone) {
+    alert("يرجى تعبئة جميع الحقول");
+    return;
+  }
+
+  if (!phoneRegex.test(phone)) {
+    alert("❌ يرجى إدخال رقم هاتف أردني صحيح مكون من 10 أرقام ويبدأ بـ 07");
+    return;
+  }
+
+  try {
+    const allUsersRes = await fetch(API_URL);
+    const allUsers = await allUsersRes.json();
+
+    const isEmailTaken = allUsers.some(u => u.email === email && u.id !== userId);
+    const isPhoneTaken = allUsers.some(u => u.phone === phone && u.id !== userId);
+
+    if (isEmailTaken) {
+      alert("❌ البريد الإلكتروني مستخدم بالفعل من قبل مستخدم آخر");
+      return;
+    }
+
+    if (isPhoneTaken) {
+      alert("❌ رقم الهاتف مستخدم بالفعل من قبل مستخدم آخر");
+      return;
+    }
+
+    const updatedUser = { name, email, phone, role };
+
+    const res = await fetch(`${API_URL}/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(updatedUser)
+    });
+
+    if (!res.ok) throw new Error("فشل في حفظ التعديلات");
+
+    alert("✅ تم تحديث بيانات المستخدم بنجاح");
+    window.location.href = "admin.html";
+  } catch (err) {
+    console.error(err);
+    alert("❌ حدث خطأ أثناء حفظ البيانات");
+  }
+}
+
+
+  function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const icon = document.querySelector('.toggle-dark i');
+    if (document.body.classList.contains('dark-mode')) {
+      localStorage.setItem('darkMode', 'enabled');
+      icon.classList.replace('fa-moon', 'fa-sun');
+    } else {
+      localStorage.removeItem('darkMode');
+      icon.classList.replace('fa-sun', 'fa-moon');
+    }
+  }
+
+  if (localStorage.getItem('darkMode')) {
+    document.body.classList.add('dark-mode');
+    const icon = document.querySelector('.toggle-dark i');
+    icon.classList.replace('fa-moon', 'fa-sun');
+  }
+
+  window.onload = populateForm;
+</script>
+
+</body>
+</html>

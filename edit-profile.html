@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تعديل الملف الشخصي</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+ <style>
+    :root {
+      --primary-color: #0d47a1;
+      --secondary-color: #1976d2;
+      --text-color: #333;
+      --light-gray: #f5f5f5;
+      --white: #ffffff;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--light-gray);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 0 15px;
+    }
+
+    .edit-form {
+      background-color: var(--white);
+      padding: 30px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      transition: var(--transition);
+    }
+
+    .edit-form:hover {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .edit-form h2 {
+      color: var(--primary-color);
+      margin-bottom: 25px;
+      text-align: center;
+      font-size: 24px;
+      position: relative;
+      padding-bottom: 10px;
+    }
+
+    .edit-form h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background-color: var(--secondary-color);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .edit-form input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      transition: var(--transition);
+    }
+
+    .edit-form input:focus {
+      border-color: var(--secondary-color);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+    }
+
+    .edit-form input:disabled {
+      background-color: #f0f0f0;
+      cursor: not-allowed;
+    }
+
+    .image-upload {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .image-upload label {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: var(--light-gray);
+      color: var(--primary-color);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 600;
+      border: 1px dashed var(--primary-color);
+    }
+
+    .image-upload label:hover {
+      background-color: #e0e0e0;
+    }
+
+    #profileImage {
+      display: none;
+    }
+
+    #preview {
+      max-width: 150px;
+      max-height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--secondary-color);
+      margin: 15px auto;
+      display: block;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 20px;
+    }
+
+    .btn:hover {
+      background-color: #1565c0;
+      transform: translateY(-2px);
+    }
+
+    .btn i {
+      margin-left: 8px;
+    }
+
+    .toggle-dark {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .toggle-dark:hover {
+      transform: scale(1.1);
+    }
+
+    /* Dark Mode Styles */
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .edit-form {
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode input {
+      background-color: #2d2d2d;
+      color: #e0e0e0;
+      border-color: #444;
+    }
+
+    body.dark-mode input:disabled {
+      background-color: #333;
+    }
+
+    body.dark-mode .image-upload label {
+      background-color: #333;
+      color: #e0e0e0;
+      border-color: #555;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 10px;
+      }
+      
+      .edit-form {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+ <div id="navbar-placeholder"></div>
+</header>
+<div class="container">
+  <div class="edit-form">
+    <h2>تعديل الملف الشخصي</h2>
+
+    <div class="form-group">
+      <label for="name">الاسم الكامل</label>
+      <input type="text" id="name" placeholder="أدخل اسمك الكامل" />
+    </div>
+
+    <div class="form-group">
+      <label for="email">البريد الإلكتروني</label>
+      <input type="email" id="email" disabled />
+    </div>
+
+    <div class="form-group">
+      <label for="phone">رقم الهاتف</label>
+      <input type="tel" id="phone" />
+    </div>
+
+    <div class="image-upload">
+      <label for="profileImage"><i class="fas fa-camera"></i> تغيير صورة الملف الشخصي</label>
+      <input type="file" id="profileImage" accept="image/*" />
+      <img id="preview" src="" alt="معاينة الصورة" />
+    </div>
+
+    <button class="btn" onclick="saveChanges()">
+      <i class="fas fa-save"></i> حفظ التعديلات
+    </button>
+  </div>
+</div>
+
+<button class="toggle-dark" onclick="toggleDarkMode()">
+  <i class="fas fa-moon"></i>
+</button>
+<footer>
+ <div id="footer-placeholder"></div></footer>
+ <script src="main.js"></script>
+<script>
+  const apiUrl = "https://6844373271eb5d1be032b52a.mockapi.io/users";
+  const email = sessionStorage.getItem("email");
+  if (!email) window.location.href = "login.html";
+
+  let userId = null;
+
+  // جلب بيانات المستخدم من MockAPI
+  fetch(`${apiUrl}?email=${encodeURIComponent(email)}`)
+    .then(res => res.json())
+    .then(users => {
+      if (users.length === 0) {
+        alert("لم يتم العثور على بيانات المستخدم.");
+        window.location.href = "login.html";
+        return;
+      }
+
+      const user = users[0];
+      userId = user.id;
+
+      document.getElementById("name").value = user.name || "";
+      document.getElementById("email").value = user.email;
+      document.getElementById("phone").value = user.phone || "";
+      if (user.imageData) {
+        document.getElementById("preview").src = user.imageData;
+      }
+    });
+
+  document.getElementById("profileImage").addEventListener("change", function () {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const preview = document.getElementById("preview");
+        preview.src = e.target.result;
+        preview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  function saveChanges() {
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const phoneRegex = /^07[7-9]\d{7}$/;
+
+    if (!name || !phoneRegex.test(phone)) {
+      alert("يرجى إدخال بيانات صحيحة.");
+      return;
+    }
+
+    const updatedUser = {
+      name,
+      phone,
+      imageData: document.getElementById("preview").src
+    };
+
+    fetch(`${apiUrl}/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(updatedUser)
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert("✅ تم حفظ التعديلات بنجاح!");
+      sessionStorage.setItem("username", name);
+      window.location.href = "profile.html";
+    })
+    .catch(err => {
+      alert("حدث خطأ أثناء حفظ البيانات");
+      console.error(err);
+    });
+  }
+
+  // الوضع الليلي
+  function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+  }
+
+  if (localStorage.getItem('darkMode') === 'true') {
+    document.body.classList.add('dark-mode');
+  }
+</script>
+
+</body>
+</html>

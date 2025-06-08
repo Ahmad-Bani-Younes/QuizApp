@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الملف الشخصي</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --gray-color: #6c757d;
+      --border-radius: 12px;
+      --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      color: var(--dark-color);
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    
+    .profile-card {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    
+    .profile-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      z-index: 1;
+    }
+    
+    .profile-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .profile-card h2 {
+      color: white;
+      margin: 0 0 20px;
+      position: relative;
+      z-index: 2;
+      font-size: 1.8rem;
+    }
+    
+    .profile-img-container {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      margin: 0 auto 20px;
+      z-index: 2;
+    }
+    
+    #userImage {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 5px solid white;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+      transition: var(--transition);
+    }
+    
+    #userImage:hover {
+      transform: scale(1.05);
+    }
+    
+    .profile-info {
+      text-align: right;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      padding: 10px;
+      background-color: var(--light-color);
+      border-radius: var(--border-radius);
+      position: relative;
+      z-index: 2;
+    }
+    
+    .profile-info strong {
+      color: var(--primary-color);
+      margin-left: 10px;
+    }
+    
+    .profile-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 30px;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .profile-btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: var(--border-radius);
+      background-color: var(--primary-color);
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    
+    .profile-btn:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .profile-btn i {
+      font-size: 1.2rem;
+    }
+    
+    .edit-btn {
+      background-color: #ff9800;
+    }
+    
+    .edit-btn:hover {
+      background-color: #e68a00;
+    }
+    
+    .password-btn {
+      background-color: #4caf50;
+    }
+    
+    .password-btn:hover {
+      background-color: #3d8b40;
+    }
+    
+    @media (max-width: 768px) {
+      .profile-card {
+        padding: 20px;
+      }
+      
+      .profile-card h2 {
+        font-size: 1.5rem;
+      }
+      
+      .profile-img-container {
+        width: 120px;
+        height: 120px;
+      }
+      
+      .profile-info {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+ <header>
+ <div id="navbar-placeholder"></div>
+</header>
+
+  <div class="container">
+    <div class="profile-card">
+      <h2><i class="fas fa-user-circle"></i> الملف الشخصي</h2>
+      
+      <div class="profile-img-container">
+        <img id="userImage" src="https://via.placeholder.com/150/cccccc/ffffff?text=صورة+المستخدم" alt="صورة المستخدم" />
+      </div>
+
+      <div class="profile-info">
+        <strong>الاسم:</strong> <span id="name"></span>
+      </div>
+      
+      <div class="profile-info">
+        <strong>البريد الإلكتروني:</strong> <span id="email"></span>
+      </div>
+      
+      <div class="profile-info">
+        <strong>رقم الهاتف:</strong> <span id="phone"></span>
+      </div>
+      
+      <div class="profile-actions">
+        <button class="profile-btn edit-btn" onclick="window.location.href='edit-profile.html'">
+          <i class="fas fa-edit"></i> تعديل البيانات
+        </button>
+        
+        <button class="profile-btn password-btn" onclick="window.location.href='change-password.html'">
+          <i class="fas fa-key"></i> تغيير كلمة المرور
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+ <div id="footer-placeholder"></div></footer>
+ <script src="main.js"></script>
+<script>
+  const API_BASE = "https://6844373271eb5d1be032b52a.mockapi.io/users";
+
+  async function loadProfile() {
+    const email = sessionStorage.getItem("email");
+    if (!email) return window.location.href = "login.html";
+
+    try {
+      const res = await fetch(`${API_BASE}?email=${email}`);
+      const data = await res.json();
+
+      if (!data.length) {
+        alert("لم يتم العثور على بيانات المستخدم.");
+        return window.location.href = "login.html";
+      }
+
+      const user = data[0];
+      document.getElementById("name").textContent = user.name || "غير محدد";
+      document.getElementById("email").textContent = user.email;
+      document.getElementById("phone").textContent = user.phone || "غير محدد";
+      
+      if (user.imageData) {
+        document.getElementById("userImage").src = user.imageData;
+      }
+
+    } catch (err) {
+      console.error("فشل تحميل بيانات المستخدم:", err);
+      alert("⚠️ حدث خطأ أثناء تحميل البيانات.");
+      window.location.href = "login.html";
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", loadProfile);
+</script>
+
+</body>
+</html>

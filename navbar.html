@@ -1,0 +1,90 @@
+<nav class="navbar">
+  <div class="nav-container">
+    <!-- للزوار فقط -->
+    <div class="nav-guest">
+      <a href="index.html" class="nav-link">🏠 الرئيسية</a>
+      <a href="login.html" class="nav-link">🔐 تسجيل الدخول</a>
+      <a href="register.html" class="nav-link">📝 إنشاء حساب</a>
+    </div>
+
+    <!-- للمستخدم بعد تسجيل الدخول -->
+    <div class="nav-user" style="display: none;">
+      <a href="index.html" class="nav-link">🏠 الرئيسية</a>
+      <!-- <a href="quiz.html" class="nav-link">🧠 الاختبارات</a>
+      <a href="result.html" class="nav-link">📊 نتيجتي</a> -->
+      <a href="profile.html" class="nav-link">👤 الملف الشخصي</a>
+      
+      <a href="#" onclick="logout()" class="nav-link logout-btn">🚪 تسجيل الخروج</a>
+      
+      <!-- التحية بالاسم -->
+      <span id="user-greeting" class="greeting-text"></span>
+    </div>
+  </div>
+</nav>
+
+<style>
+  .navbar {
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    padding: 0.8rem 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .nav-guest, .nav-user {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .nav-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+  
+  .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+  }
+  
+  .logout-btn:hover {
+    background-color: rgba(231, 76, 60, 0.2);
+  }
+  
+  .greeting-text {
+    margin-right: 10px;
+    font-weight: bold;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+  }
+  
+  /* تصميم متجاوب للهواتف */
+  @media (max-width: 768px) {
+    .nav-guest, .nav-user {
+      gap: 0.8rem;
+    }
+    
+    .nav-link {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.9rem;
+    }
+    
+    .greeting-text {
+      display: none;
+    }
+  }
+</style>

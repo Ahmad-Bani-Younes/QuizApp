@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لعبة إكس أو - XO Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee; 
+      --secondary-color: #3a0ca3;
+      --accent-color: #f72585;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #4cc9f0;
+      --warning-color: #f8961e;
+      --danger-color: #ef233c;
+      --border-radius: 12px;
+      --box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+      color: var(--dark-color);
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    h1 {
+      color: var(--primary-color);
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      position: relative;
+      display: inline-block;
+    }
+    h1::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: var(--accent-color);
+      border-radius: 2px;
+    }
+    .game-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      background-color: var(--light-color);
+      padding: 1rem;
+      border-radius: var(--border-radius);
+    }
+    .player-turn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .player-turn i {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+    }
+    .timer {
+      background-color: var(--dark-color);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .timer i {
+      color: var(--warning-color);
+    }
+.game-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+    .cell {
+      aspect-ratio: 1/1;
+      background-color: white;
+      border: 2px solid #e9ecef;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      cursor: pointer;
+      transition: var(--transition);
+      border-radius: var(--border-radius);
+      position: relative;
+      overflow: hidden;
+    }
+    .cell:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--box-shadow);
+      border-color: var(--primary-color);
+    }
+    .cell.x::before,
+    .cell.x::after,
+    .cell.o::before {
+      content: "";
+      position: absolute;
+      background-color: var(--primary-color);
+    }
+    .cell.x::before,
+    .cell.x::after {
+      width: 80%;
+      height: 10px;
+      top: 50%;
+      left: 10%;
+    }
+    .cell.x::before {
+      transform: translateY(-50%) rotate(45deg);
+    }
+    .cell.x::after {
+      transform: translateY(-50%) rotate(-45deg);
+    }
+    .cell.o::before {
+      width: 60%;
+      height: 60%;
+      border-radius: 50%;
+      border: 10px solid var(--secondary-color);
+    }
+    .game-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background-color: white;
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      text-align: center;
+      transition: var(--transition);
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+    .stat-card h3 {
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+    .stat-card p {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .x-wins {
+      border-top: 4px solid var(--primary-color);
+    }
+    .o-wins {
+      border-top: 4px solid var(--secondary-color);
+    }
+    .draws {
+      border-top: 4px solid var(--warning-color);
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    button {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 50px;
+      font-family: 'Tajawal', sans-serif;
+      font-weight: bold;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-3px);
+    }
+    .btn-secondary {
+      background-color: var(--light-color);
+      color: var(--dark-color);
+    }
+    .btn-secondary:hover {
+      background-color: #e9ecef;
+      transform: translateY(-3px);
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+    .modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+      transform: translateY(-50px);
+      transition: var(--transition);
+    }
+    .modal.active .modal-content {
+      transform: translateY(0);
+    }
+    .modal h2 {
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+    .modal p {
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+    }
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--dark-color);
+    }
+    .winner-animation {
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: var(--accent-color);
+      opacity: 0;
+    }
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      .game-stats {
+        grid-template-columns: 1fr;
+      }
+      .controls {
+        flex-direction: column;
+      }
+    }
+    .winning-cell {
+      background-color: rgba(67, 97, 238, 0.2);
+      animation: glow 1.5s infinite alternate;
+    }
+    @keyframes glow {
+      from {
+        box-shadow: 0 0 5px rgba(67, 97, 238, 0.5);
+      }
+      to {
+        box-shadow: 0 0 20px rgba(67, 97, 238, 0.8);
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+ <div id="navbar-placeholder"></div>
+</header>
+<div class="container">
+  <header>
+    <h1><i class="fas fa-times-circle"></i> لعبة إكس أو <i class="far fa-circle"></i></h1>
+    <p>استمتع بلعبة الذكاء والتحدي مع صديقك!</p>
+  </header>
+<div class="mode-switch">
+  <label for="ai-mode">
+    <input type="checkbox" id="ai-mode" />
+    ضد الكمبيوتر 🤖
+  </label>
+</div>
+
+  <div class="game-info">
+    <div class="player-turn">
+      <i class="fas fa-user"></i>
+      <span id="current-player">دور اللاعب X</span>
+    </div>
+    <div class="timer">
+      <i class="fas fa-clock"></i>
+      <span id="time-left">30 ثانية</span>
+    </div>
+  </div>
+
+  <div class="game-stats">
+    <div class="stat-card x-wins">
+      <h3>فوز X</h3>
+      <p id="x-wins">0</p>
+    </div>
+    <div class="stat-card draws">
+      <h3>تعادلات</h3>
+      <p id="draws">0</p>
+    </div>
+    <div class="stat-card o-wins">
+      <h3>فوز O</h3>
+      <p id="o-wins">0</p>
+    </div>
+  </div>
+
+  <div class="game-board" id="game-board"></div>
+
+  <div class="controls">
+    <select id="board-size-select" class="btn-secondary">
+  <option value="3">3 × 3</option>
+  <option value="4" selected>4 × 4</option>
+  <option value="5">5 × 5</option>
+</select>
+
+    <button class="btn-primary" id="reset-btn">
+      <i class="fas fa-redo"></i> إعادة اللعبة
+    </button>
+    <button class="btn-secondary" id="how-to-play-btn">
+      <i class="fas fa-question-circle"></i> كيف تلعب
+    </button>
+  </div>
+</div>
+
+<!-- نافذة النتائج -->
+<div class="modal" id="result-modal">
+  <div class="modal-content">
+    <span class="close-modal" id="close-modal">&times;</span>
+    <h2 id="modal-title">تهانينا!</h2>
+    <p id="modal-message">الفائز هو اللاعب X</p>
+    <button class="btn-primary" id="modal-btn">حسناً</button>
+  </div>
+</div>
+
+<!-- نافذة التعليمات -->
+<div class="modal" id="how-to-play-modal">
+  <div class="modal-content">
+    <span class="close-modal" id="close-how-to-play">&times;</span>
+    <h2><i class="fas fa-question-circle"></i> كيفية اللعب</h2>
+    <p>لعبة XO هي لعبة استراتيجية بين لاعبين:</p>
+    <ul style="text-align: right; margin: 1rem 0; list-style-type: none;">
+      <li><i class="fas fa-check"></i> اللاعب X يبدأ دائماً</li>
+      <li><i class="fas fa-check"></i> النقر على أي خلية فارغة لوضع علامتك</li>
+      <li><i class="fas fa-check"></i> الفائز هو من يحصل على 3 علامات متتالية (أفقياً، عمودياً أو قطرياً)</li>
+      <li><i class="fas fa-check"></i> إذا امتلأت الخلايا بدون فائز، تكون النتيجة تعادل</li>
+      <li><i class="fas fa-check"></i> لديك 30 ثانية لكل حركة</li>
+    </ul>
+    <p>استمتع باللعبة!</p>
+  </div>
+</div>
+<footer>
+ <div id="footer-placeholder"></div></footer>
+ <script src="main.js"></script>
+<script>
+  // رابط MockAPI الخاص بك
+  const API_GAMES = "https://68458d2ffc51878754dba0bb.mockapi.io/games"; 
+  const userId = sessionStorage.getItem("userId");
+let playWithAI = false;
+let aiEnabledCheckbox = document.getElementById('ai-mode');
+aiEnabledCheckbox.addEventListener('change', () => {
+  playWithAI = aiEnabledCheckbox.checked;
+});
+
+  // التأكد من تسجيل الدخول
+  function checkLogin() {
+    if (!userId) {
+      alert("يرجى تسجيل الدخول أولًا!");
+      window.location.href = "login.html";
+    }
+  }
+
+  // عرض إحصائيات المستخدم
+  async function displayUserStats() {
+    try {
+      const res = await fetch(`${API_GAMES}?userId=${userId}`);
+      const games = await res.json();
+      let totalXWins = 0;
+      let totalOWins = 0;
+      let totalDraws = 0;
+
+      games.forEach(game => {
+        totalXWins += game.xWins || 0;
+        totalOWins += game.oWins || 0;
+        totalDraws += game.draws || 0;
+      });
+
+      const statsContainer = document.createElement('div');
+      statsContainer.style.position = 'fixed';
+      statsContainer.style.top = '20px';
+      statsContainer.style.right = '20px';
+      statsContainer.style.backgroundColor = '#fff';
+      statsContainer.style.padding = '1rem';
+      statsContainer.style.borderRadius = '12px';
+      statsContainer.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+      statsContainer.style.zIndex = '999';
+      statsContainer.style.textAlign = 'right';
+      statsContainer.style.fontFamily = '"Tajawal", sans-serif';
+
+      statsContainer.innerHTML = `
+        <h3 style="color: var(--primary-color); margin-bottom: 0.5rem;">نتائجك</h3>
+        <p>🏆 فوز X: ${totalXWins}</p>
+        <p>🥈 فوز O: ${totalOWins}</p>
+        <p>🤝 تعادلات: ${totalDraws}</p>
+      `;
+
+      document.body.appendChild(statsContainer);
+    } catch (err) {
+      console.error("فشل في تحميل الإحصائيات");
+    }
+  }
+
+  // العناصر الأساسية
+  const boardElement = document.getElementById('game-board');
+  const currentPlayerDisplay = document.getElementById('current-player');
+  const timeLeftDisplay = document.getElementById('time-left');
+  const xWinsDisplay = document.getElementById('x-wins');
+  const oWinsDisplay = document.getElementById('o-wins');
+  const drawsDisplay = document.getElementById('draws');
+  const resetBtn = document.getElementById('reset-btn');
+
+  // المتغيرات الأساسية
+let boardSize = parseInt(document.getElementById('board-size-select').value);
+let winLength = Math.min(4, boardSize);
+
+let board = new Array(boardSize * boardSize).fill('');
+  let currentPlayer = 'X';
+  let gameActive = true;
+  let timeLeft = 30;
+  let timer;
+  let xWins = 0;
+  let oWins = 0;
+  let draws = 0;
+  let firstMove = true;
+document.getElementById('board-size-select').addEventListener('change', () => {
+  boardSize = parseInt(document.getElementById('board-size-select').value);
+  winLength = Math.min(4, boardSize);
+  board = new Array(boardSize * boardSize).fill('');
+  resetGame();
+});
+
+
+  // تهيئة اللعبة
+  function initGame() {
+    createBoard();
+    updateGameStatus();
+  }
+
+  // إنشاء لوحة اللعب
+  function createBoard() {
+    boardElement.innerHTML = '';
+    boardElement.style.gridTemplateColumns = `repeat(${boardSize}, 1fr)`;
+
+for (let i = 0; i < boardSize * boardSize; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.dataset.index = i;
+      cell.addEventListener('click', () => handleCellClick(i));
+      boardElement.appendChild(cell);
+    }
+  }
+
+  // التعامل مع النقر على الخلية
+  function handleCellClick(index) {
+    if (board[index] !== '' || !gameActive) return;
+
+    board[index] = currentPlayer;
+    updateBoard();
+
+    if (firstMove) {
+      startTimer();
+      firstMove = false;
+    }
+
+    if (checkWin(currentPlayer)) {
+      endGame(currentPlayer);
+      highlightWinningCells();
+    } else if (isDraw()) {
+      endGame(null);
+    } else {
+      switchPlayer();
+    }
+  }
+
+  // تحديث لوحة اللعب
+  function updateBoard() {
+    const cells = document.querySelectorAll('.cell');
+    cells.forEach((cell, index) => {
+      cell.className = 'cell';
+      if (board[index] === 'X') {
+        cell.classList.add('x');
+      } else if (board[index] === 'O') {
+        cell.classList.add('o');
+      }
+    });
+  }
+
+  // التحقق من الفوز
+function checkWin(player) {
+  winningCells = [];
+  const size = boardSize;
+
+  // صفوف
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c <= size - winLength; c++) {
+      const i = r * size + c;
+      if ([...Array(winLength).keys()].every(k => board[i + k] === player)) {
+        winningCells = [...Array(winLength).keys()].map(k => i + k);
+        return true;
+      }
+    }
+  }
+
+  // أعمدة
+  for (let c = 0; c < size; c++) {
+    for (let r = 0; r <= size - winLength; r++) {
+      const i = r * size + c;
+      if ([...Array(winLength).keys()].every(k => board[i + k * size] === player)) {
+        winningCells = [...Array(winLength).keys()].map(k => i + k * size);
+        return true;
+      }
+    }
+  }
+
+  // القطر ↘
+  for (let r = 0; r <= size - winLength; r++) {
+    for (let c = 0; c <= size - winLength; c++) {
+      const i = r * size + c;
+      if ([...Array(winLength).keys()].every(k => board[i + k * (size + 1)] === player)) {
+        winningCells = [...Array(winLength).keys()].map(k => i + k * (size + 1));
+        return true;
+      }
+    }
+  }
+
+  // القطر ↙
+  for (let r = 0; r <= size - winLength; r++) {
+    for (let c = winLength - 1; c < size; c++) {
+      const i = r * size + c;
+      if ([...Array(winLength).keys()].every(k => board[i + k * (size - 1)] === player)) {
+        winningCells = [...Array(winLength).keys()].map(k => i + k * (size - 1));
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+
+
+  // التحقق من التعادل
+  function isDraw() {
+    return board.every(cell => cell !== '');
+  }
+
+  // تبديل اللاعب
+function switchPlayer() {
+  clearInterval(timer);
+  currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+  updateGameStatus();
+
+  if (playWithAI && currentPlayer === 'O') {
+    setTimeout(() => {
+      makeAIMove();
+    }, 800); // انتظار بسيط قبل لعب الكمبيوتر
+  } else {
+    startTimer();
+  }
+}
+
+
+  // إنهاء اللعبة
+  function endGame(winner) {
+    gameActive = false;
+    clearInterval(timer);
+
+    if (winner === 'X') {
+      xWins++;
+      xWinsDisplay.textContent = xWins;
+    } else if (winner === 'O') {
+      oWins++;
+      oWinsDisplay.textContent = oWins;
+    } else {
+      draws++;
+      drawsDisplay.textContent = draws;
+    }
+
+    saveGameToMockAPI(); // حفظ النتيجة
+    showResultModal('تهانينا!', winner ? `الفائز هو اللاعب ${winner}` : 'لا يوجد فائز في هذه الجولة');
+    createConfetti();
+  }
+
+  // تحديث حالة اللعبة
+  function updateGameStatus() {
+    currentPlayerDisplay.innerHTML = `
+      ${currentPlayer === 'X' ? '<i class="fas fa-times" style="color: var(--primary-color);"></i>' : '<i class="far fa-circle" style="color: var(--secondary-color);"></i>'}
+      دور اللاعب ${currentPlayer}`;
+  }
+
+  // المؤقت
+  function startTimer() {
+    clearInterval(timer);
+    timeLeft = 30;
+    updateTimerDisplay();
+    timer = setInterval(() => {
+      timeLeft--;
+      updateTimerDisplay();
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        alert(`انتهى الوقت! اللاعب ${currentPlayer} خسر دوره`);
+        switchPlayer();
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay() {
+    timeLeftDisplay.textContent = `${timeLeft} ثانية`;
+    timeLeftDisplay.style.color = timeLeft <= 10 ? 'var(--danger-color)' : 'white';
+  }
+
+  // إظهار الخلايا الفائزة
+  function highlightWinningCells() {
+    winningCells.forEach(index => {
+      const cell = document.querySelector(`.cell[data-index="${index}"]`);
+      cell.classList.add('winning-cell');
+    });
+  }
+
+  // عرض نافذة النتيجة
+  function showResultModal(title, message) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-message').textContent = message;
+    document.getElementById('result-modal').classList.add('active');
+  }
+
+  // إعادة تشغيل اللعبة
+function resetGame() {
+  board = new Array(boardSize * boardSize).fill('');
+  currentPlayer = 'X';
+  gameActive = true;
+  firstMove = true;
+  createBoard(); // مهم لتوليد كل الخلايا من جديد
+  updateBoard();
+  updateGameStatus();
+  timeLeft = 30;
+  updateTimerDisplay();
+  winningCells = [];
+
+  if (playWithAI && currentPlayer === 'O') {
+    setTimeout(() => {
+      makeAIMove();
+    }, 800);
+  }
+}
+
+
+
+  // كونفيتي
+  function createConfetti() {
+    const container = document.querySelector('.container');
+    for (let i = 0; i < 100; i++) {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti');
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.top = '-10px';
+      confetti.style.backgroundColor = getRandomColor();
+      container.appendChild(confetti);
+      animateConfetti(confetti);
+    }
+  }
+
+  function animateConfetti(confetti) {
+    let position = -10;
+    let rotation = 0;
+    const speed = 2 + Math.random() * 3;
+    const spin = (Math.random() - 0.5) * 20;
+
+    const fall = setInterval(() => {
+      position += speed;
+      rotation += spin;
+      confetti.style.top = position + 'px';
+      confetti.style.transform = `rotate(${rotation}deg)`;
+
+      if (position > window.innerHeight) {
+        clearInterval(fall);
+        confetti.remove();
+      }
+    }, 20);
+  }
+
+  function getRandomColor() {
+    const colors = ['#4361ee', '#3a0ca3', '#f72585', '#4cc9f0', '#f8961e'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  // الأحداث
+  resetBtn.addEventListener('click', resetGame);
+  document.getElementById('modal-btn').addEventListener('click', () => {
+    document.getElementById('result-modal').classList.remove('active');
+    resetGame();
+  });
+  document.getElementById('close-modal').addEventListener('click', () => {
+    document.getElementById('result-modal').classList.remove('active');
+    resetGame();
+  });
+
+  document.getElementById('how-to-play-btn').addEventListener('click', () => {
+    document.getElementById('how-to-play-modal').classList.add('active');
+  });
+  document.getElementById('close-how-to-play').addEventListener('click', () => {
+    document.getElementById('how-to-play-modal').classList.remove('active');
+  });
+
+  // --- تخزين اللعبة في MockAPI ---
+  async function saveGameToMockAPI() {
+    const data = {
+      userId: userId,
+      board: board,
+      currentPlayer: currentPlayer,
+      gameActive: gameActive,
+      xWins: xWins,
+      oWins: oWins,
+      draws: draws,
+      createdAt: new Date().toISOString()
+    };
+
+    await fetch(API_GAMES, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  }
+
+  // --- استرجاع أحدث لعبة ---
+  async function loadLastGameFromMockAPI() {
+    try {
+      const res = await fetch(`${API_GAMES}?userId=${userId}`);
+      const games = await res.json();
+      if (games.length > 0) {
+        const lastGame = games[games.length - 1];
+board = lastGame.board || new Array(boardSize * boardSize).fill('');
+        currentPlayer = lastGame.currentPlayer || 'X';
+        gameActive = lastGame.gameActive !== undefined ? lastGame.gameActive : true;
+        xWins = lastGame.xWins || 0;
+        oWins = lastGame.oWins || 0;
+        draws = lastGame.draws || 0;
+        xWinsDisplay.textContent = xWins;
+        oWinsDisplay.textContent = oWins;
+        drawsDisplay.textContent = draws;
+      }
+    } catch (err) {
+      console.error("فشل في استرجاع اللعبة");
+    }
+  }
+
+function makeAIMove() {
+  if (!gameActive) return;
+
+  const emptyCells = board
+    .map((val, idx) => val === '' ? idx : null)
+    .filter(idx => idx !== null);
+
+  if (emptyCells.length === 0) return;
+
+  // أفضلية تقييم: رقم أعلى = خيار أقوى
+  function evaluateMove(index) {
+    let score = 0;
+
+    // إذا فاز بالحركة
+    board[index] = 'O';
+    if (checkWin('O')) {
+      board[index] = '';
+      return 100;
+    }
+    board[index] = '';
+
+    // إذا منع الخصم من الفوز
+    board[index] = 'X';
+    if (checkWin('X')) {
+      board[index] = '';
+      return 80;
+    }
+    board[index] = '';
+
+    // تفضيل المركز
+    const centerIndex = Math.floor(board.length / 2);
+    if (index === centerIndex) score += 15;
+
+    // تفضيل الزوايا
+    const size = Math.sqrt(board.length);
+    const corners = [0, size - 1, board.length - size, board.length - 1];
+    if (corners.includes(index)) score += 10;
+
+    // كلما كانت الخلية في منتصف السطر أو العمود زاد تقييمها
+    const row = Math.floor(index / size);
+    const col = index % size;
+    if (row === 1 || col === 1) score += 5;
+
+    return score;
+  }
+
+  let bestScore = -Infinity;
+  let bestMove = null;
+
+  for (const index of emptyCells) {
+    const score = evaluateMove(index);
+    if (score > bestScore) {
+      bestScore = score;
+      bestMove = index;
+    }
+  }
+
+  // تنفيذ الحركة الأفضل
+  board[bestMove] = 'O';
+  updateBoard();
+
+  if (checkWin('O')) {
+    endGame('O');
+    highlightWinningCells();
+  } else if (isDraw()) {
+    endGame(null);
+  } else {
+    currentPlayer = 'X';
+    updateGameStatus();
+    startTimer();
+  }
+}
+
+
+
+  // --- تنفيذ عند تحميل الصفحة ---
+  window.addEventListener('DOMContentLoaded', async () => {
+    checkLogin();
+    await loadLastGameFromMockAPI();
+    initGame();
+    displayUserStats();
+  });
+</script>
+</body>
+</html>

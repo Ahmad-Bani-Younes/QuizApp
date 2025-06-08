@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>تسجيل مستخدم جديد</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --primary-dark: #3a0ca3;
+      --success-color: #4caf50;
+      --error-color: #f44336;
+      --warning-color: #ff9800;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --gray-color: #6c757d;
+    }
+    
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .register-container {
+      width: 100%;
+      max-width: 500px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .register-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+    }
+
+    h2 {
+      color: var(--primary-color);
+      margin-bottom: 30px;
+      font-size: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+      text-align: right;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--dark-color);
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 15px 45px 15px 15px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s;
+      font-family: 'Tajawal', sans-serif;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary-color);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .form-group i {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      color: var(--gray-color);
+    }
+
+    .password-toggle {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--gray-color);
+    }
+
+    .error-message {
+      color: var(--error-color);
+      font-size: 0.85rem;
+      margin-top: 5px;
+      text-align: right;
+      display: block;
+      height: 18px;
+    }
+
+    #password-strength {
+      height: 6px;
+      width: 100%;
+      background-color: #e9ecef;
+      margin-top: 10px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    #strength-bar {
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease, background-color 0.3s;
+    }
+
+    #strength-label {
+      font-size: 0.85rem;
+      margin-top: 5px;
+      text-align: right;
+      display: block;
+      height: 18px;
+    }
+
+    .register-btn {
+      width: 100%;
+      padding: 15px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Tajawal', sans-serif;
+      margin-top: 15px;
+    }
+
+    .register-btn:hover:not(:disabled) {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .register-btn:disabled {
+      background-color: var(--gray-color);
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .login-link {
+      margin-top: 25px;
+      color: var(--gray-color);
+    }
+
+    .login-link a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
+    /* Dark Mode */
+    body.dark-mode {
+      background-color: #121212;
+      color: #eee;
+    }
+
+    body.dark-mode .register-container {
+      background-color: #1e1e1e;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark-mode .form-group input {
+      background-color: #2d2d2d;
+      border-color: #444;
+      color: #eee;
+    }
+
+    body.dark-mode .form-group label,
+    body.dark-mode .login-link {
+      color: #aaa;
+    }
+
+    .toggle-dark {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      color: white;
+      font-size: 1.3rem;
+      border: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      z-index: 9999;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-dark:hover {
+      transform: scale(1.1);
+    }
+
+    @media (max-width: 576px) {
+      .register-container {
+        padding: 30px 20px;
+        margin: 20px;
+      }
+      
+      h2 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- زر تفعيل الوضع الليلي -->
+  <button class="toggle-dark" onclick="toggleDarkMode()">🌓</button>
+
+  <!-- اختياري: لو حابب تعرض نافبار -->
+  <div id="navbar-placeholder"></div>
+
+  <div class="main-content">
+    <div class="register-container">
+      <h2>تسجيل مستخدم جديد</h2>
+      
+      <div class="form-group">
+        <label for="name">الاسم الكامل</label>
+        <i class="fas fa-user"></i>
+        <input type="text" id="name" placeholder="أدخل اسمك الكامل" />
+        <span class="error-message" id="name-error"></span>
+      </div>
+      
+      <div class="form-group">
+        <label for="email">البريد الإلكتروني</label>
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="email" placeholder="example@domain.com" />
+        <span class="error-message" id="email-error"></span>
+      </div>
+      
+      <div class="form-group">
+        <label for="phone">رقم الهاتف</label>
+        <i class="fas fa-phone"></i>
+        <input type="tel" id="phone" placeholder="07XXXXXXXX" />
+        <span class="error-message" id="phone-error"></span>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">كلمة المرور</label>
+        <i class="fas fa-lock"></i>
+        <span class="password-toggle" onclick="togglePassword('password')">
+          <i class="fas fa-eye"></i>
+        </span>
+        <input type="password" id="password" placeholder="أدخل كلمة مرور قوية" />
+        <div id="password-strength"><div id="strength-bar"></div></div>
+        <span id="strength-label"></span>
+        <span class="error-message" id="password-error"></span>
+      </div>
+      
+      <div class="form-group">
+        <label for="confirmPassword">تأكيد كلمة المرور</label>
+        <i class="fas fa-lock"></i>
+        <span class="password-toggle" onclick="togglePassword('confirmPassword')">
+          <i class="fas fa-eye"></i>
+        </span>
+        <input type="password" id="confirmPassword" placeholder="أعد إدخال كلمة المرور" />
+        <span class="error-message" id="confirm-error"></span>
+      </div>
+      
+      <button class="register-btn" id="register" onclick="register()" disabled>إنشاء حساب</button>
+      
+      <div class="login-link">
+        لديك حساب بالفعل؟ <a href="login.html">سجل الدخول الآن</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="main.js"></script>
+  <script>
+  const API_BASE = "https://6844373271eb5d1be032b52a.mockapi.io/users";
+
+  const nameInput = document.getElementById('name');
+  const emailInput = document.getElementById('email');
+  const phoneInput = document.getElementById('phone');
+  const passwordInput = document.getElementById('password');
+  const confirmInput = document.getElementById('confirmPassword');
+  const strengthBar = document.getElementById("strength-bar");
+  const strengthLabel = document.getElementById("strength-label");
+  const registerBtn = document.getElementById('register');
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^07[789]\d{7}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+  const fields = [nameInput, emailInput, phoneInput, passwordInput, confirmInput];
+  fields.forEach(field => field.addEventListener('input', validateAllFields));
+  passwordInput.addEventListener("input", updatePasswordStrength);
+
+  async function isEmailTaken(email) {
+    const res = await fetch(API_BASE);
+    const users = await res.json();
+    return users.some(u => u.email === email);
+  }
+
+  async function isPhoneTaken(phone) {
+    const res = await fetch(API_BASE);
+    const users = await res.json();
+    return users.some(u => u.phone === phone);
+  }
+
+  async function validateAllFields() {
+    let allValid = true;
+
+    // الاسم
+    if (nameInput.value.trim().length < 3) {
+      showError('name-error', 'الاسم يجب أن يكون 3 أحرف على الأقل');
+      allValid = false;
+    } else {
+      clearError('name-error');
+    }
+
+    // البريد
+    const email = emailInput.value.trim();
+    if (!emailRegex.test(email)) {
+      showError('email-error', 'البريد الإلكتروني غير صالح');
+      allValid = false;
+    } else if (await isEmailTaken(email)) {
+      showError('email-error', 'هذا البريد الإلكتروني مستخدم مسبقًا');
+      allValid = false;
+    } else {
+      clearError('email-error');
+    }
+
+    // الهاتف
+    const phone = phoneInput.value.trim();
+    if (!phoneRegex.test(phone)) {
+      showError('phone-error', 'يجب أن يبدأ رقم الهاتف بـ 07 ويحتوي على 10 أرقام');
+      allValid = false;
+    } else if (await isPhoneTaken(phone)) {
+      showError('phone-error', 'رقم الهاتف مستخدم من قبل');
+      allValid = false;
+    } else {
+      clearError('phone-error');
+    }
+
+    // كلمة المرور
+    if (!passwordRegex.test(passwordInput.value)) {
+      showError('password-error', 'يجب أن تحتوي على حروف كبيرة وصغيرة وأرقام ورموز');
+      allValid = false;
+    } else {
+      clearError('password-error');
+    }
+
+    // تأكيد كلمة المرور
+    if (confirmInput.value !== passwordInput.value || confirmInput.value === "") {
+      showError('confirm-error', 'كلمتا المرور غير متطابقتين');
+      allValid = false;
+    } else {
+      clearError('confirm-error');
+    }
+
+    registerBtn.disabled = !allValid;
+  }
+
+  function updatePasswordStrength() {
+    const val = passwordInput.value;
+    let strength = 0;
+    if (val.length >= 8) strength++;
+    if (/[a-z]/.test(val)) strength++;
+    if (/[A-Z]/.test(val)) strength++;
+    if (/\d/.test(val)) strength++;
+    if (/[\W_]/.test(val)) strength++;
+
+    const percent = (strength / 5) * 100;
+    strengthBar.style.width = percent + "%";
+
+    if (strength <= 2) {
+      strengthBar.style.backgroundColor = "#f44336";
+      strengthLabel.textContent = "ضعيفة";
+    } else if (strength <= 4) {
+      strengthBar.style.backgroundColor = "#ff9800";
+      strengthLabel.textContent = "متوسطة";
+    } else {
+      strengthBar.style.backgroundColor = "#4caf50";
+      strengthLabel.textContent = "قوية";
+    }
+  }
+
+  function showError(id, msg) {
+    document.getElementById(id).textContent = msg;
+  }
+
+  function clearError(id) {
+    document.getElementById(id).textContent = "";
+  }
+
+  function togglePassword(id) {
+    const input = document.getElementById(id);
+    const icon = input.nextElementSibling.querySelector('i');
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+      input.type = "password";
+      icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+  }
+
+  async function register() {
+    if (registerBtn.disabled) return;
+
+    const user = {
+      name: nameInput.value.trim(),
+      email: emailInput.value.trim(),
+      phone: phoneInput.value.trim(),
+      password: passwordInput.value,
+      role: "user"
+    };
+
+    try {
+      await fetch(API_BASE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(user)
+      });
+
+      alert("🎉 تم إنشاء الحساب بنجاح!\nسيتم تحويلك إلى صفحة تسجيل الدخول");
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1500);
+    } catch (err) {
+      console.error(err);
+      alert("⚠️ حدث خطأ أثناء التسجيل. حاول مرة أخرى.");
+    }
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+    localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+    document.querySelector('.toggle-dark').innerText = document.body.classList.contains("dark-mode") ? "☀️" : "🌓";
+  }
+
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark-mode");
+    document.querySelector('.toggle-dark').innerText = "☀️";
+  }
+</script>
+
+</body>
+</html>

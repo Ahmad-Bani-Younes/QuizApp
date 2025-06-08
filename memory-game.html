@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لعبة الذكريات</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --primary-dark: #3a0ca3;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #4cc9f0;
+      --danger-color: #ef233c;
+      --warning-color: #ff9e00;
+      --border-radius: 16px;
+      --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+      --card-size: 100px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      color: var(--dark-color);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 10px;
+      background: linear-gradient(90deg, var(--primary-color), var(--success-color), var(--warning-color));
+    }
+
+    h1 {
+      color: var(--primary-color);
+      margin: 0.5rem 0 1.5rem;
+      font-size: 2.2rem;
+      position: relative;
+      display: inline-block;
+    }
+
+    h1::after {
+      content: "";
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background: var(--primary-color);
+      border-radius: 2px;
+    }
+
+    .level-select {
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: rgba(67, 97, 238, 0.05);
+      border-radius: var(--border-radius);
+    }
+
+    .level-select label {
+      font-weight: 500;
+      margin-left: 0.5rem;
+      color: var(--primary-color);
+    }
+
+    .level-select select {
+      padding: 0.5rem 1rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-family: 'Tajawal';
+      margin: 0 1rem;
+      background: white;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .level-select select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .board {
+      display: grid;
+      gap: 1rem;
+      margin: 2rem 0;
+      justify-content: center;
+    }
+
+    .card {
+      width: var(--card-size);
+      height: var(--card-size);
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 2.5rem;
+      transition: var(--transition);
+      position: relative;
+      perspective: 1000px;
+      transform-style: preserve-3d;
+    }
+
+    .card::before {
+      content: "?";
+      position: absolute;
+      backface-visibility: hidden;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 10px;
+      transform: rotateY(0deg);
+      transition: var(--transition);
+    }
+
+    .card.flipped::before,
+    .card.matched::before {
+      transform: rotateY(180deg);
+    }
+
+    .card.flipped::after,
+    .card.matched::after {
+      content: attr(data-emoji);
+      position: absolute;
+      backface-visibility: hidden;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 10px;
+      transform: rotateY(180deg);
+    }
+
+    .card.matched::after {
+      background: var(--success-color);
+      box-shadow: 0 0 15px rgba(76, 201, 240, 0.5);
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .card.matched {
+      cursor: default;
+      transform: rotateY(180deg);
+    }
+
+    .score-timer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-bottom: 1.5rem;
+    }
+
+    .score-box, .timer-box {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      background: rgba(67, 97, 238, 0.1);
+    }
+
+    .score-box i, .timer-box i {
+      margin-left: 0.5rem;
+      color: var(--primary-color);
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(3px);
+    }
+
+    .modal.active {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      transform: translateY(0);
+      animation: slideUp 0.4s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-content h2 {
+      color: var(--success-color);
+      margin-top: 0;
+    }
+
+    .modal-content p {
+      margin: 1rem 0;
+      font-size: 1.1rem;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      margin: 1.5rem 0;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+
+    .btn {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Tajawal';
+      font-weight: 500;
+      font-size: 1rem;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0.5rem;
+    }
+
+    .btn i {
+      margin-left: 0.5rem;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .btn-outline:hover {
+      background: rgba(67, 97, 238, 0.1);
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: #f00;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    /* تأثيرات للبطاقات */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .card-effect {
+      animation: pulse 0.5s ease;
+    }
+
+    /* تصميم متجاوب */
+    @media (max-width: 768px) {
+      .container {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+
+      :root {
+        --card-size: 80px;
+      }
+
+      .card {
+        font-size: 2rem;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .level-select {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .level-select select {
+        margin: 0.5rem 0;
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      :root {
+        --card-size: 70px;
+      }
+
+      .card {
+        font-size: 1.8rem;
+      }
+
+      .score-timer {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fas fa-brain"></i> لعبة الذكريات</h1>
+
+    <div class="score-timer">
+      <div class="score-box">
+        <i class="fas fa-star"></i>
+        <span id="score">النقاط: 0</span>
+      </div>
+      <div class="timer-box">
+        <i class="fas fa-clock"></i>
+        <span id="timer">الوقت: 60</span>
+      </div>
+    </div>
+
+    <div class="level-select">
+      <label for="level"><i class="fas fa-layer-group"></i> اختر المستوى:</label>
+      <select id="level">
+        <option value="easy">سهل (4×2)</option>
+        <option value="medium">متوسط (4×3)</option>
+        <option value="hard">صعب (4×4)</option>
+      </select>
+      <button class="btn" onclick="startGame()">
+        <i class="fas fa-play"></i> ابدأ اللعبة
+        <p id="best-score-display" style="margin-top: 10px; color: #3a0ca3; font-weight: 500;"></p>
+      </button>
+    </div>
+
+    <div class="board" id="game-board"></div>
+
+    <!-- نافذة الفوز -->
+    <div class="modal" id="win-modal">
+      <div class="modal-content">
+        <h2><i class="fas fa-trophy"></i> تهانينا!</h2>
+        <p>لقد أكملت اللعبة بنجاح!</p>
+        
+        <div class="stats">
+          <div class="stat-item">
+            <div class="stat-value" id="final-score">0</div>
+            <div class="stat-label">النقاط</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="final-time">0</div>
+            <div class="stat-label">ثانية</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="final-moves">0</div>
+            <div class="stat-label">حركة</div>
+          </div>
+        </div>
+
+        <button class="btn" onclick="closeWinModal()">
+          <i class="fas fa-redo"></i> لعب مرة أخرى
+        </button>
+        <button class="btn btn-outline" onclick="shareResult()">
+          <i class="fas fa-share"></i> مشاركة النتيجة
+        </button>
+      </div>
+    </div>
+    <h2 style="margin-top: 2rem; color: var(--primary-color);">📜 سجل الألعاب السابقة</h2>
+<div id="game-history" style="text-align: right; background: #f9f9f9; padding: 1rem; border-radius: 12px; box-shadow: var(--box-shadow); max-height: 300px; overflow-y: auto;">
+  <p>جارٍ التحميل...</p>
+</div>
+
+  </div>
+
+  <script>
+    const boardElement = document.getElementById('game-board');
+    const scoreDisplay = document.getElementById('score');
+    const timerDisplay = document.getElementById('timer');
+    const winModal = document.getElementById('win-modal');
+    const finalScoreDisplay = document.getElementById('final-score');
+    const finalTimeDisplay = document.getElementById('final-time');
+    const finalMovesDisplay = document.getElementById('final-moves');
+
+    let gridSize = { rows: 4, cols: 2 };
+    let cards = [];
+    let flippedCards = [];
+    let matchedCards = [];
+    let score = 0;
+    let timeLeft = 60;
+    let timerInterval;
+    let gameActive = false;
+    let moveCount = 0;
+
+    const emojis = ['🐶', '🐱', '🦊', '🐻', '🐼', '🐸', '🐵', '🦁', '🐯', '🦄', '🐮', '🐷'];
+
+    const API_URL = "https://68458d2ffc51878754dba0bb.mockapi.io/games";
+    const userId = sessionStorage.getItem("userId");
+
+    // ✅ التحقق من تسجيل الدخول
+    function checkLogin() {
+      if (!userId) {
+        alert("يجب تسجيل الدخول أولاً.");
+        window.location.href = "login.html";
+      }
+    }
+
+    // ✅ تأكد من تسجيل الدخول قبل كل شيء
+    window.addEventListener('DOMContentLoaded', () => {
+      checkLogin();
+        loadGameHistory(); // ✅ أضف هذا
+    });
+
+    function startGame() {
+      if (!userId) {
+        alert("يرجى تسجيل الدخول أولاً.");
+        return;
+      }
+
+      resetGame();
+      const level = document.getElementById('level').value;
+
+      if (level === 'easy') {
+        gridSize = { rows: 4, cols: 2 };
+        timeLeft = 60;
+      } else if (level === 'medium') {
+        gridSize = { rows: 4, cols: 3 };
+        timeLeft = 90;
+      } else if (level === 'hard') {
+        gridSize = { rows: 4, cols: 4 };
+        timeLeft = 120;
+      }
+
+      generateCards();
+      renderBoard();
+      gameActive = true;
+      startTimer();
+      loadBestScore();
+    }
+
+    function generateCards() {
+      const totalPairs = (gridSize.rows * gridSize.cols) / 2;
+      const selectedEmojis = shuffle([...emojis]).slice(0, totalPairs);
+      cards = [...selectedEmojis, ...selectedEmojis];
+      cards = shuffle(cards);
+    }
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function renderBoard() {
+      boardElement.innerHTML = '';
+      boardElement.style.gridTemplateColumns = `repeat(${gridSize.cols}, var(--card-size))`;
+
+      cards.forEach((emoji, index) => {
+        const cardDiv = document.createElement('div');
+        cardDiv.classList.add('card');
+        cardDiv.dataset.index = index;
+        cardDiv.dataset.emoji = emoji;
+        cardDiv.addEventListener('click', () => flipCard(index));
+        boardElement.appendChild(cardDiv);
+      });
+    }
+
+    function flipCard(index) {
+      if (!gameActive || flippedCards.includes(index) || matchedCards.includes(index)) return;
+
+      const card = document.querySelector(`.card[data-index="${index}"]`);
+      card.classList.add('flipped', 'card-effect');
+      setTimeout(() => card.classList.remove('card-effect'), 500);
+      
+      flippedCards.push(index);
+      moveCount++;
+
+      if (flippedCards.length === 2) {
+        checkMatch();
+      }
+    }
+
+    function checkMatch() {
+      const [first, second] = flippedCards;
+      const firstCard = document.querySelector(`.card[data-index="${first}"]`);
+      const secondCard = document.querySelector(`.card[data-index="${second}"]`);
+
+if (cards[first] === cards[second]) {
+  // ✅ أضف الكروت المتطابقة
+  matchedCards.push(first, second);
+
+  setTimeout(() => {
+    firstCard.classList.add('matched');
+    secondCard.classList.add('matched');
+  }, 300);
+
+  score += 10;
+  updateScore();
+
+  // ✅ تحقق من إنهاء اللعبة بشكل صحيح
+  if (matchedCards.length === cards.length) {
+    setTimeout(() => endGame(true), 500);
+  }
+
+} else {
+  // عدم تطابق
+  setTimeout(() => {
+    firstCard.classList.remove('flipped');
+    secondCard.classList.remove('flipped');
+  }, 1000);
+
+  score = Math.max(0, score - 1);
+  updateScore();
+}
+
+flippedCards = [];
+
+    }
+
+    function updateScore() {
+      scoreDisplay.textContent = `النقاط: ${score}`;
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      updateTimerDisplay();
+      
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        
+        if (timeLeft <= 10) {
+          timerDisplay.style.color = 'var(--danger-color)';
+        }
+        
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          endGame(false);
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerDisplay.textContent = `الوقت: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+
+    function endGame(won) {
+      gameActive = false;
+      clearInterval(timerInterval);
+
+      if (won) {
+        finalScoreDisplay.textContent = score;
+        finalTimeDisplay.textContent = timeLeft;
+        finalMovesDisplay.textContent = moveCount;
+        winModal.classList.add('active');
+        createConfetti();
+        saveHighScore(score);
+      } else {
+        alert("انتهى الوقت! حاول مرة أخرى.");
+      }
+    }
+
+    function createConfetti() {
+      const colors = ['#4361ee', '#4cc9f0', '#ef233c', '#ff9e00', '#7209b7'];
+      
+      for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.top = -10 + 'px';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.width = Math.random() * 10 + 5 + 'px';
+        confetti.style.height = confetti.style.width;
+        document.body.appendChild(confetti);
+        
+        const animationDuration = Math.random() * 3 + 2;
+        
+        confetti.animate([
+          { top: '-10px', transform: 'rotate(0deg)' },
+          { top: '100vh', transform: 'rotate(360deg)' }
+        ], {
+          duration: animationDuration * 1000,
+          easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)',
+          fill: 'forwards'
+        });
+        
+        setTimeout(() => confetti.remove(), animationDuration * 1000);
+      }
+    }
+
+    function closeWinModal() {
+      winModal.classList.remove('active');
+      document.querySelectorAll('.confetti').forEach(el => el.remove());
+    }
+
+    function resetGame() {
+      score = 0;
+      moveCount = 0;
+      flippedCards = [];
+      matchedCards = [];
+      updateScore();
+      timeLeft = parseInt(document.getElementById('level').value === 'easy' ? 60 : 
+                  document.getElementById('level').value === 'medium' ? 90 : 120);
+      updateTimerDisplay();
+      timerDisplay.style.color = 'inherit';
+      boardElement.innerHTML = '';
+    }
+
+    function shareResult() {
+      const text = `لقد حصلت على ${score} نقطة في لعبة الذاكرة! هل يمكنك التغلب على نتيجتي؟`;
+      
+      if (navigator.share) {
+        navigator.share({
+          title: 'نتيجة لعبة الذاكرة',
+          text: text,
+          url: window.location.href
+        }).catch(err => {
+          console.log('Error sharing:', err);
+          fallbackShare(text);
+        });
+      } else {
+        fallbackShare(text);
+      }
+    }
+
+    function fallbackShare(text) {
+      const shareUrl = `whatsapp://send?text=${encodeURIComponent(text + ' ' + window.location.href)}`;
+      window.open(shareUrl, '_blank');
+    }
+
+    async function saveHighScore(score) {
+      if (!userId) return;
+
+      try {
+     await fetch(API_URL, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ 
+    userId,
+    score: Number(score),
+    time: Number(timeLeft),
+    moves: Number(moveCount),
+    date: new Date().toISOString(),
+    level: document.getElementById('level').value
+  })
+});
+
+      } catch (err) {
+        console.error("فشل في حفظ النقاط:", err);
+      }
+    }
+
+  async function loadBestScore() {
+  if (!userId) return;
+
+  try {
+    const res = await fetch(`${API_URL}?userId=${userId}`);
+    const games = await res.json();
+    if (games.length > 0) {
+      const currentLevel = document.getElementById('level').value;
+      const levelGames = games.filter(g => g.level === currentLevel);
+      
+      if (levelGames.length > 0) {
+        const bestGame = levelGames.reduce((best, game) => (game.score > best.score ? game : best), { score: 0 });
+        document.getElementById("best-score-display").textContent = `🏆 أفضل نتيجة لك في هذا المستوى: ${bestGame.score} نقطة`;
+      } else {
+        document.getElementById("best-score-display").textContent = "";
+      }
+    }
+  } catch (err) {
+    console.error("فشل في استرجاع النتائج:", err);
+    document.getElementById("best-score-display").textContent = "";
+  }
+}
+
+
+
+function getSafeValue(value) {
+  if (value === null || value === undefined) return 'غير متوفر';
+  if (typeof value === 'object') return 'غير متوفر';
+  return value;
+}
+
+
+
+
+
+async function loadGameHistory() {
+  if (!userId) return;
+
+  const historyContainer = document.getElementById("game-history");
+  historyContainer.innerHTML = "<p>جارٍ التحميل...</p>";
+
+  try {
+    const res = await fetch(`${API_URL}?userId=${userId}&sortBy=date&order=desc`);
+    const games = await res.json();
+
+    if (games.length === 0) {
+      historyContainer.innerHTML = "<p>لا يوجد ألعاب مسجلة بعد.</p>";
+      return;
+    }
+
+    historyContainer.innerHTML = `
+      <table style="width:100%; border-collapse: collapse; font-size: 0.95rem;">
+        <thead>
+          <tr style="background-color: #e9ecef;">
+            <th style="padding: 8px; border: 1px solid #ccc;">📅 التاريخ</th>
+            <th style="padding: 8px; border: 1px solid #ccc;">🎯 النقاط</th>
+            <th style="padding: 8px; border: 1px solid #ccc;">⏱️ الوقت المتبقي</th>
+            <th style="padding: 8px; border: 1px solid #ccc;">🔁 الحركات</th>
+            <th style="padding: 8px; border: 1px solid #ccc;">🎮 المستوى</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${games.map(game => `
+            <tr>
+              <td style="padding: 8px; border: 1px solid #ddd;">${new Date(game.date).toLocaleString('ar-EG')}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${getSafeValue(game.score)}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${getSafeValue(game.time)} ثانية</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${getSafeValue(game.moves)}</td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${translateLevel(getSafeValue(game.level))}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
+
+  } catch (err) {
+    historyContainer.innerHTML = "<p>حدث خطأ أثناء تحميل السجل.</p>";
+    console.error("فشل في تحميل السجل:", err);
+  }
+}
+
+
+function translateLevel(level) {
+  if (level === "easy") return "سهل";
+  if (level === "medium") return "متوسط";
+  if (level === "hard") return "صعب";
+  return level;
+}
+
+  </script>
+</body>
+</html>
