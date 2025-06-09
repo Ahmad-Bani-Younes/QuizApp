@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>الأصدقاء</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #4f46e5;
+    }
+
+    .users-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .user-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      width: 250px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    .user-card:hover {
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      transform: translateY(-3px);
+    }
+
+    .user-card img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+    }
+
+    .user-card h3 {
+      margin: 10px 0;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .add-btn {
+      background-color: #4f46e5;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .add-btn:hover {
+      background-color: #4338ca;
+    }
+
+    .logout {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .logout:hover {
+      background: #dc2626;
+    }
+  </style>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+  <script src="main.js"></script>
+
+<h1>الأصدقاء المقترحين</h1>
+<button class="logout" onclick="logout()">تسجيل الخروج</button>
+<div class="users-container" id="usersContainer"></div>
+
+<script>
+const USERS_API = "https://6844373271eb5d1be032b52a.mockapi.io/users";
+const FRIENDS_API = "https://68458d2ffc51878754dba0bb.mockapi.io/friends";
+const currentUserId = sessionStorage.getItem("userId");
+
+if (!currentUserId) {
+  alert("يجب تسجيل الدخول أولًا.");
+  window.location.href = "login.html";
+}
+
+let allFriends = [];
+
+async function fetchUsersAndFriends() {
+  const [usersRes, friendsRes] = await Promise.all([
+    fetch(USERS_API),
+    fetch(FRIENDS_API)
+  ]);
+
+  const users = await usersRes.json();
+  allFriends = await friendsRes.json();
+
+  const filteredUsers = users.filter(user =>
+    user.id !== currentUserId &&
+    user.role !== "admin"
+  );
+
+  displayUsers(filteredUsers);
+}
+
+function getFriendStatus(friendId) {
+  const sent = allFriends.find(f => f.userId === currentUserId && f.friendId === friendId);
+  const received = allFriends.find(f => f.userId === friendId && f.friendId === currentUserId);
+
+  if (sent && received) return "friend";
+  if (sent && !received) return "pending";
+  if (!sent && received) return "confirm";
+  return "add";
+}
+
+
+function displayUsers(users) {
+  const container = document.getElementById("usersContainer");
+  container.innerHTML = "";
+
+  users.forEach(user => {
+    const status = getFriendStatus(user.id);
+
+    let btnHtml = "";
+    if (status === "add") {
+      btnHtml = `<button class="add-btn" onclick="sendFriendRequest('${user.id}', '${user.name}')">أضف كصديق</button>`;
+    } else if (status === "pending") {
+      btnHtml = `<button class="add-btn" disabled>قيد الانتظار</button>`;
+    } else if (status === "confirm") {
+      btnHtml = `<button class="add-btn" onclick="confirmFriend('${user.id}', '${user.name}')">قبول الصداقة</button>`;
+    } else {
+      btnHtml = `<button class="add-btn" disabled>صديق ✅</button>`;
+    }
+
+    const statusText = 
+      status === "friend" ? "🤝 صديق" :
+      status === "pending" ? "🕓 قيد الانتظار" :
+      status === "confirm" ? "💌 طلب وارد" :
+      "👤 ليس صديقًا";
+
+    const card = document.createElement("div");
+    card.className = "user-card";
+    card.innerHTML = `
+      <img src="${user.imageData || 'https://via.placeholder.com/100'}" alt="${user.name}">
+      <h3>${user.name}</h3>
+      <p style="color: gray; font-size: 13px;">${statusText}</p>
+      ${btnHtml}
+    `;
+    container.appendChild(card);
+  });
+}
+
+
+async function sendFriendRequest(friendId, friendName) {
+  try {
+    await fetch(FRIENDS_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: currentUserId,
+        friendId: friendId,
+        createdAt: new Date().toISOString()
+      })
+    });
+    alert(`✅ تم إرسال طلب الصداقة إلى ${friendName}`);
+    fetchUsersAndFriends(); // تحديث
+  } catch (err) {
+    console.error(err);
+    alert("❌ فشل في إرسال الطلب");
+  }
+}
+async function confirmFriend(friendId, friendName) {
+  try {
+    const existing = allFriends.find(f =>
+      f.userId === friendId && f.friendId === currentUserId
+    );
+
+    const alreadyConfirmed = allFriends.find(f =>
+      f.userId === currentUserId && f.friendId === friendId
+    );
+
+    if (alreadyConfirmed) {
+      alert("⚠️ تم تأكيد هذه الصداقة من قبل.");
+      return;
+    }
+
+    if (existing) {
+      // فقط نكمل العلاقة بإضافة الطرف العكسي
+      await fetch(FRIENDS_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: currentUserId,
+          friendId: friendId,
+          createdAt: new Date().toISOString()
+        })
+      });
+
+      alert(`✅ تم تأكيد الصداقة مع ${friendName}`);
+      fetchUsersAndFriends();
+    } else {
+      alert("❌ لا يوجد طلب صداقة وارد من هذا المستخدم.");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("❌ فشل في تأكيد الصداقة");
+  }
+}
+
+
+
+function logout() {
+  sessionStorage.clear();
+  window.location.href = "login.html";
+}
+
+fetchUsersAndFriends();
+</script>
+
+</body>
+</html>

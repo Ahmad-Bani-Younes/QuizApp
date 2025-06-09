@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>إضافة اختبار جديد</title>
@@ -301,6 +304,101 @@
         flex-direction: column;
       }
     }
+
+
+    .file-upload-section {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.upload-option {
+  margin-bottom: 15px;
+}
+
+.btn-upload {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-image {
+  background: #28a745;
+  border: 2px solid #28a745;
+  color: white;
+}
+
+.btn-image:hover {
+  background: #218838;
+  border-color: #1e7e34;
+}
+
+.btn-excel {
+  background: #1f7244;
+  border: 2px solid #1f7244;
+  color: white;
+}
+
+.btn-excel:hover {
+  background: #196c3d;
+  border-color: #166133;
+}
+
+.btn-convert {
+  background: #17a2b8;
+  border: 2px solid #17a2b8;
+  color: white;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+}
+
+.btn-convert:hover {
+  background: #138496;
+  border-color: #117a8b;
+}
+
+.upload-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ocr-textarea {
+  min-height: 150px;
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 12px;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.form-control-file {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border: 2px dashed #ced4da;
+  border-radius: 8px;
+  background: white;
+  text-align: center;
+  cursor: pointer;
+}
+
+.form-control-file:hover {
+  border-color: #adb5bd;
+}
   </style>
 </head>
 <body>
@@ -316,6 +414,45 @@
   </div>
 
   <form id="testForm" onsubmit="saveTest(event)">
+<div class="file-upload-section">
+  <!-- زر تحميل الصورة -->
+  <div class="upload-option">
+    <button type="button" class="btn btn-upload btn-image" onclick="document.getElementById('imageUpload').click()">
+      <i class="fas fa-image"></i> استخراج أسئلة من صورة
+    </button>
+    <input type="file" id="imageUpload" accept="image/*" style="display: none" onchange="processImage(this)">
+  </div>
+  
+  <!-- منطقة عرض النص المستخرج -->
+  <div class="ocr-result-container" id="ocrContainer" style="display: none;">
+    <div class="form-group">
+      <label for="ocrResult" class="upload-label">
+        <i class="fas fa-text-height"></i> النص المستخرج من الصورة
+      </label>
+      <textarea id="ocrResult" class="form-control ocr-textarea" placeholder="سيتم عرض الأسئلة المستخرجة من الصورة هنا..." readonly></textarea>
+      <button type="button" class="btn btn-convert" onclick="convertTextToQuestion()">
+        <i class="fas fa-magic"></i> تحويل إلى سؤال تلقائيًا
+      </button>
+    </div>
+  </div>
+  
+  <!-- زر تحميل Excel -->
+  <div class="upload-option">
+    <button type="button" class="btn btn-upload btn-excel" onclick="document.getElementById('excelUpload').click()">
+      <i class="fas fa-file-excel"></i> استيراد من Excel
+    </button>
+    <input type="file" id="excelUpload" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleExcelUpload(this)">
+  </div>
+  
+  <!-- تحميل ملف JSON -->
+  <div class="form-group upload-option">
+    <label for="jsonFile" class="upload-label">
+      <i class="fas fa-file-code"></i> تحميل أسئلة من ملف JSON
+    </label>
+    <input type="file" id="jsonFile" class="form-control-file" accept=".json" onchange="loadQuestionsFromJSON(this)">
+  </div>
+</div>
+
     <div class="form-group">
       <label for="title">اسم الاختبار</label>
       <input type="text" id="title" required placeholder="أدخل اسم الاختبار">
@@ -352,6 +489,7 @@
         <i class="fas fa-save"></i> حفظ الاختبار
       </button>
     </div>
+   
   </form>
 </div>
 
@@ -533,6 +671,175 @@ if (localStorage.getItem('darkMode') === 'true') {
 window.onload = function () {
   for (let i = 0; i < 3; i++) addQuestion();
 };
+
+function processImage(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  showAlert("⏳ يتم الآن قراءة الصورة وتحليلها...", "warning");
+
+  Tesseract.recognize(
+    file,
+    'ara',
+    { logger: m => console.log(m) }
+  ).then(({ data: { text } }) => {
+    console.log("🧠 النص المستخرج:\n", text);
+    document.getElementById("ocrResult").value = text.trim();
+    document.getElementById("ocrContainer").style.display = "block"; // ✅ أظهر التكست إريا
+    showAlert("✅ تم استخراج النص بنجاح! يمكنك نسخه أدناه", "success");
+  }).catch(err => {
+    console.error(err);
+    showAlert("❌ فشل في قراءة الصورة. تأكد من وضوحها.", "danger");
+  });
+}
+
+
+function parseQuestionsFromText(text) {
+  text = text.replace(/\r/g, '').replace(/[\u200f\u200e]/g, '').trim();
+
+  const questionLine = text.match(/سؤال\s*[:：]?\s*(.*)/);
+  const qTitle = questionLine ? questionLine[1].trim() : null;
+
+  // ✅ استخراج الخيارات بطريقة موثوقة
+  const optionsMatches = [...text.matchAll(/^([1-4١-٤])\)?\s*(.+)$/gm)];
+  if (optionsMatches.length < 4) {
+    showAlert("⚠️ لم يتم التعرف على كل الخيارات.", "warning");
+    return;
+  }
+
+  const options = optionsMatches.map(match => match[2].trim());
+
+  const answerMatch = text.match(/الإجابة\s*[:：]?\s*(\d|[١-٤])/);
+  let correct = answerMatch ? answerMatch[1] : null;
+
+  const arabicDigits = { '١': '1', '٢': '2', '٣': '3', '٤': '4' };
+  if (correct in arabicDigits) correct = arabicDigits[correct];
+
+  if (!qTitle || options.length < 4 || !correct) {
+    showAlert("⚠️ لم يتم التعرف على كل البيانات بشكل صحيح.", "warning");
+    return;
+  }
+
+  addQuestion();
+
+  const allQuestions = document.querySelectorAll('.question-box');
+  const box = allQuestions[allQuestions.length - 1];
+
+  if (!box) return;
+
+  box.querySelector(`input[name$="-title"]`).value = qTitle;
+  box.querySelector(`input[name$="-opt1"]`).value = options[0];
+  box.querySelector(`input[name$="-opt2"]`).value = options[1];
+  box.querySelector(`input[name$="-opt3"]`).value = options[2];
+  box.querySelector(`input[name$="-opt4"]`).value = options[3];
+  box.querySelector(`select[name$="-correct"]`).value = parseInt(correct) - 1;
+
+  updateQuestionNumbers();
+  showAlert("✅ تم استخراج السؤال بنجاح!", "success");
+}
+
+
+
+function handleExcelUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: 'array' });
+
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+    // 🧹 تنظيف الأسئلة القديمة
+    document.getElementById("questionsContainer").innerHTML = "";
+    questionCounter = 0;
+
+    // توقع: [السؤال، الخيار1، الخيار2، الخيار3، الخيار4، رقم الصحيح]
+    for (let i = 1; i < json.length; i++) {
+      const row = json[i];
+      if (!row || row.length < 6) continue;
+
+      const [qTitle, opt1, opt2, opt3, opt4, correct] = row;
+
+      addQuestion();
+
+      const allQuestions = document.querySelectorAll('.question-box');
+      const box = allQuestions[allQuestions.length - 1];
+
+      box.querySelector(`input[name$="-title"]`).value = qTitle || "";
+      box.querySelector(`input[name$="-opt1"]`).value = opt1 || "";
+      box.querySelector(`input[name$="-opt2"]`).value = opt2 || "";
+      box.querySelector(`input[name$="-opt3"]`).value = opt3 || "";
+      box.querySelector(`input[name$="-opt4"]`).value = opt4 || "";
+      box.querySelector(`select[name$="-correct"]`).value = parseInt(correct) - 1;
+    }
+
+    updateQuestionNumbers();
+    showAlert("✅ تم استيراد الأسئلة من Excel!", "success");
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
+
+function convertTextToQuestion() {
+  const text = document.getElementById("ocrResult").value.trim();
+  if (!text) {
+    showAlert("⚠️ لا يوجد نص لتحويله", "warning");
+    return;
+  }
+
+  parseQuestionsFromText(text);
+}
+
+
+
+function loadQuestionsFromJSON(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const json = JSON.parse(e.target.result);
+      if (!Array.isArray(json)) {
+        showAlert("⚠️ الملف يجب أن يحتوي على مصفوفة من الأسئلة", "warning");
+        return;
+      }
+
+      json.forEach((q, i) => {
+        if (!q.question || !q.options || !Array.isArray(q.options) || typeof q.correctIndex !== 'number') {
+          showAlert(`⚠️ يوجد خطأ في بنية السؤال رقم ${i + 1}`, "danger");
+          return;
+        }
+
+        addQuestion();
+        const boxes = document.querySelectorAll(".question-box");
+        const box = boxes[boxes.length - 1];
+
+        box.querySelector(`input[name$="-title"]`).value = q.question;
+        box.querySelector(`input[name$="-opt1"]`).value = q.options[0] || '';
+        box.querySelector(`input[name$="-opt2"]`).value = q.options[1] || '';
+        box.querySelector(`input[name$="-opt3"]`).value = q.options[2] || '';
+        box.querySelector(`input[name$="-opt4"]`).value = q.options[3] || '';
+        box.querySelector(`select[name$="-correct"]`).value = q.correctIndex;
+      });
+
+      updateQuestionNumbers();
+      showAlert("✅ تم استيراد الأسئلة من الملف بنجاح", "success");
+
+    } catch (error) {
+      console.error(error);
+      showAlert("❌ حدث خطأ أثناء قراءة الملف. تأكد من أن التنسيق صحيح.", "danger");
+    }
+  };
+
+  reader.readAsText(file);
+}
+
 </script>
 
 

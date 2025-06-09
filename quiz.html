@@ -336,9 +336,8 @@
   </style>
 </head>
 <body>
-<header>
- <div id="navbar-placeholder"></div>
-</header>
+
+
 <!-- ✅ الأصوات -->
 <audio id="error-sound" src="https://www.soundjay.com/button/sounds/beep-08b.mp3" preload="auto"></audio>
 <audio id="success-sound" src="https://www.soundjay.com/button/sounds/button-10.mp3" preload="auto"></audio>
@@ -368,8 +367,6 @@
     </div>
   </div>
 </div>
-<footer>
- <div id="footer-placeholder"></div></footer>
  <script src="main.js"></script>
 <script>
   const email = sessionStorage.getItem("email");
@@ -516,6 +513,8 @@
     sessionStorage.setItem('last_score', score);
     sessionStorage.setItem('total_questions', questions.length);
     sessionStorage.setItem('questions', JSON.stringify(questions));
+    sessionStorage.setItem('latest_result', JSON.stringify(resultData));
+
     window.location.href = 'result.html';
   }
 

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>XO أونلاين</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: #f0f2f5;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 { color: #4361ee; margin-bottom: 10px; }
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 80px);
+      gap: 10px;
+      justify-content: center;
+      margin: 30px auto;
+    }
+    .cell {
+      width: 80px; height: 80px;
+      background: white;
+      border: 2px solid #ccc;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+    .cell:hover {
+      background: #e8f0fe;
+    }
+    .cell.disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    .status {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    .winner {
+      font-size: 22px;
+      color: green;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+    <div id="timer" style="font-size: 20px; margin-top: 10px; color: red;"></div>
+
+  <h1>XO أونلاين مع صديقك</h1>
+  <div id="status" class="status">جاري تحميل اللعبة...</div>
+  <div id="board"></div>
+  <div class="winner" id="winnerMessage"></div>
+
+<script>
+const ROOM_API = "https://6846d3507dbda7ee7ab07f48.mockapi.io/rooms";
+const USER_API = "https://6844373271eb5d1be032b52a.mockapi.io/users";
+
+const currentUserId = sessionStorage.getItem("userId");
+const roomId = new URLSearchParams(window.location.search).get("roomId");
+const boardDiv = document.getElementById("board");
+const statusDiv = document.getElementById("status");
+const winnerMessage = document.getElementById("winnerMessage");
+
+let roomData = null;
+let usersMap = {};
+let interval;
+let mySymbol = "";
+let myTurn = false;
+let playerXName = "";
+let playerOName = "";
+let timer = 15;
+let timerInterval = null;
+
+
+async function loadUsers() {
+  const res = await fetch(USER_API);
+  const users = await res.json();
+  users.forEach(u => usersMap[u.id] = u.name);
+
+  if (roomData) {
+    playerXName = usersMap[roomData.playerXId] || "X";
+    playerOName = usersMap[roomData.playerOId] || "O";
+  }
+}
+
+async function fetchRoom() {
+  const res = await fetch(`${ROOM_API}/${roomId}`);
+  roomData = await res.json();
+  await loadUsers();
+
+  if (roomData.playerXId !== currentUserId && !roomData.playerOId) {
+    await fetch(`${ROOM_API}/${roomId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        playerOId: currentUserId,
+        currentPlayer: roomData.currentPlayer || roomData.playerXId,
+        board: Array.isArray(roomData.board) ? roomData.board : Array(9).fill("")
+      })
+    });
+    return await fetchRoom();
+  }
+
+  if (![roomData.playerXId, roomData.playerOId].includes(currentUserId)) {
+    statusDiv.textContent = "❌ أنت لست ضمن هذه الغرفة.";
+    return;
+  }
+
+  const board = Array.isArray(roomData.board) ? roomData.board : Array(9).fill("");
+  const winner = roomData.winner;
+
+  mySymbol = currentUserId === roomData.playerXId ? "X" : "O";
+  const isMyTurn = (roomData.currentPlayer === "X" && currentUserId === roomData.playerXId)
+                || (roomData.currentPlayer === "O" && currentUserId === roomData.playerOId);
+  const prevTurn = myTurn;
+  myTurn = isMyTurn;
+
+  if (winner && winner !== "") {
+    const winnerName = winner === "draw"
+      ? "تعادل"
+      : (winner === "X" ? playerXName : playerOName);
+
+    sessionStorage.setItem("xoResult", winnerName);
+    sessionStorage.setItem("playerXName", playerXName);
+    sessionStorage.setItem("playerOName", playerOName);
+    sessionStorage.setItem("lastRoomId", roomId);
+
+    clearInterval(interval);
+    clearInterval(timerInterval);
+
+    setTimeout(() => {
+      window.location.href = "friends-results.html";
+    }, 1500);
+    return;
+  }
+
+  const currentPlayerName = usersMap[roomData.currentPlayer === "X" ? roomData.playerXId : roomData.playerOId];
+  statusDiv.textContent = myTurn ? "🎮 دورك الآن" : `⌛️ في انتظار ${currentPlayerName}...`;
+
+  renderBoard(board);
+
+  if (myTurn && !prevTurn) {
+    resetTimer();
+  }
+}
+
+
+function renderBoard(board) {
+  boardDiv.innerHTML = "";
+  board.forEach((val, i) => {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    if (val) {
+      const name = usersMap[val === "X" ? roomData.playerXId : roomData.playerOId] || val;
+      cell.textContent = name.charAt(0).toUpperCase();
+      cell.classList.add("disabled");
+    } else if (myTurn) {
+      cell.onclick = () => playMove(i);
+    } else {
+      cell.classList.add("disabled");
+    }
+    boardDiv.appendChild(cell);
+  });
+}
+
+async function playMove(index) {
+  const board = Array.isArray(roomData.board) ? roomData.board : Array(9).fill("");
+  if (board[index] !== "") return;
+
+  board[index] = mySymbol;
+  const winner = checkWinner(board);
+  const nextPlayer = roomData.currentPlayer === "X" ? "O" : "X";
+
+  const updatedRoom = {
+    playerXId: roomData.playerXId,
+    playerOId: roomData.playerOId,
+    board: board,
+    currentPlayer: winner ? roomData.currentPlayer : nextPlayer,
+    winner: winner || (board.every(cell => cell) ? "draw" : ""),
+    createdAt: roomData.createdAt
+  };
+
+  await fetch(`${ROOM_API}/${roomId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updatedRoom)
+  });
+
+  await fetchRoom();
+}
+
+function checkWinner(board) {
+  const lines = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+  for (const [a, b, c] of lines) {
+    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      return board[a];
+    }
+  }
+  return null;
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timer = 15;
+  document.getElementById("timer").textContent = `⏱ الوقت المتبقي: ${timer}s`;
+
+  timerInterval = setInterval(async () => {
+    timer--;
+    document.getElementById("timer").textContent = `⏱ الوقت المتبقي: ${timer}s`;
+
+    if (timer <= 0) {
+      clearInterval(timerInterval);
+
+      // تجاوز اللاعب، تمرير الدور
+      const board = Array.isArray(roomData.board) ? roomData.board : Array(9).fill("");
+      const nextPlayer = roomData.currentPlayer === "X" ? "O" : "X";
+
+      const updatedRoom = {
+        playerXId: roomData.playerXId,
+        playerOId: roomData.playerOId,
+        board: board,
+        currentPlayer: nextPlayer,
+        winner: "",
+        createdAt: roomData.createdAt
+      };
+
+      await fetch(`${ROOM_API}/${roomId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedRoom)
+      });
+
+      await fetchRoom();
+    }
+  }, 1000);
+}
+
+
+function startPolling() {
+  interval = setInterval(fetchRoom, 1500);
+}
+
+window.onload = async () => {
+  if (!roomId || !currentUserId) {
+    alert("❌ لا يوجد معرف غرفة أو مستخدم.");
+    return;
+  }
+  await fetchRoom();
+  startPolling();
+};
+</script>
+</body>
+</html>

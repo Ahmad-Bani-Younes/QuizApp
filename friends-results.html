@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>نتائج الأصدقاء</title>
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: #f0f2f5;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+      color: #4f46e5;
+    }
+    .friend-card {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin: 1rem auto;
+      max-width: 500px;
+      text-align: center;
+    }
+    .friend-card img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+    .friend-card h3 {
+      margin-bottom: 5px;
+    }
+    .stats {
+      font-size: 14px;
+      color: #444;
+      margin: 10px 0;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .btn-online {
+      background-color: #4f46e5;
+      color: white;
+    }
+    .btn-online:hover {
+      background-color: #4338ca;
+    }
+    .result-table {
+      margin: 1.5rem auto;
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      width: fit-content;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .result-table th, .result-table td {
+      padding: 12px 20px;
+      border-bottom: 1px solid #eee;
+    }
+    .result-table th {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+
+<div id="result-box" style="text-align:center; font-size:18px; margin: 1rem; color: #333;"></div>
+<h1>نتائج أصدقائك في لعبة XO</h1>
+<h2 style="text-align:center;color:green">
+  ✅ نتيجة آخر لعبة: <span id="lastResult"></span>
+</h2>
+
+<!-- زر إعادة اللعب -->
+<div style="text-align:center; margin-top: 20px;" id="replayContainer">
+  <button id="replayBtn" class="btn btn-online">🔁 إعادة اللعب مع نفس اللاعب</button>
+</div>
+
+<!-- جدول أسماء اللاعبين -->
+<table id="players-table" class="result-table" style="display:none;">
+  <tr>
+    <th>الرمز</th>
+    <th>اللاعب</th>
+  </tr>
+  <tr>
+    <td>X</td>
+    <td id="xName"></td>
+  </tr>
+  <tr>
+    <td>O</td>
+    <td id="oName"></td>
+  </tr>
+</table>
+
+<div id="friends-container"></div>
+
+<script>
+const USERS_API = "https://6844373271eb5d1be032b52a.mockapi.io/users";
+const FRIENDS_API = "https://68458d2ffc51878754dba0bb.mockapi.io/friends";
+const GAMES_API = "https://68458d2ffc51878754dba0bb.mockapi.io/games";
+const ROOMS_API = "https://6846d3507dbda7ee7ab07f48.mockapi.io/rooms";
+
+const currentUserId = sessionStorage.getItem("userId");
+
+if (!currentUserId) {
+  alert("يرجى تسجيل الدخول.");
+  window.location.href = "login.html";
+}
+
+// ✅ نتيجة اللعبة
+const winnerName = sessionStorage.getItem("xoResult");
+const lastRoom = sessionStorage.getItem("lastRoomId");
+const playerXName = sessionStorage.getItem("playerXName");
+const playerOName = sessionStorage.getItem("playerOName");
+
+// إخفاء زر الإعادة إن لم توجد غرفة
+if (!lastRoom) {
+  document.getElementById("replayContainer").style.display = "none";
+}
+
+if (winnerName) {
+  document.getElementById("result-box").innerText = lastRoom
+    ? `🎉 الفائز في الغرفة ${lastRoom} هو: ${winnerName}`
+    : `🎉 الفائز هو: ${winnerName}`;
+
+  document.getElementById("lastResult").innerText = winnerName;
+
+  // ✅ عرض أسماء اللاعبين في جدول
+  if (playerXName || playerOName) {
+    document.getElementById("xName").textContent = playerXName || "X";
+    document.getElementById("oName").textContent = playerOName || "O";
+    document.getElementById("players-table").style.display = "table";
+  }
+
+  // ✅ حذف القيم بعد العرض (لكن نبقي lastRoomId لزر الإعادة)
+  sessionStorage.removeItem("xoResult");
+  sessionStorage.removeItem("playerXName");
+  sessionStorage.removeItem("playerOName");
+}
+
+async function fetchData() {
+  const [usersRes, friendsRes, gamesRes] = await Promise.all([
+    fetch(USERS_API), fetch(FRIENDS_API), fetch(GAMES_API)
+  ]);
+
+  const [users, friends, games] = await Promise.all([
+    usersRes.json(), friendsRes.json(), gamesRes.json()
+  ]);
+
+  const myFriends = users.filter(user => {
+    const sent = friends.find(f => f.userId === currentUserId && f.friendId === user.id);
+    const received = friends.find(f => f.userId === user.id && f.friendId === currentUserId);
+    return sent && received && user.id !== currentUserId;
+  });
+
+  displayFriends(myFriends, games);
+}
+
+function displayFriends(friends, allGames) {
+  const container = document.getElementById("friends-container");
+  container.innerHTML = "";
+
+  friends.forEach(friend => {
+    const stats = allGames.filter(g => g.userId === friend.id);
+    const xWins = stats.reduce((acc, g) => acc + (g.xWins || 0), 0);
+    const oWins = stats.reduce((acc, g) => acc + (g.oWins || 0), 0);
+    const draws = stats.reduce((acc, g) => acc + (g.draws || 0), 0);
+
+    const card = document.createElement("div");
+    card.className = "friend-card";
+    card.innerHTML = `
+      <img src="${friend.imageData || 'https://via.placeholder.com/100'}" alt="${friend.name}">
+      <h3>${friend.name}</h3>
+      <div class="stats">🥇 فوز X: ${xWins} | 🥈 فوز O: ${oWins} | 🤝 تعادلات: ${draws}</div>
+      <button class="btn btn-online" onclick="inviteOnlineGame('${friend.id}', '${friend.name}')">العب معي أونلاين 🎮</button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+async function inviteOnlineGame(friendId, friendName) {
+  const existingRoomsRes = await fetch(`${ROOMS_API}`);
+  const rooms = await existingRoomsRes.json();
+
+  const existingRoom = rooms.find(r =>
+    (r.playerXId === currentUserId && r.playerOId === friendId) ||
+    (r.playerXId === friendId && r.playerOId === currentUserId)
+  );
+
+  if (existingRoom) {
+    alert(`📡 سيتم فتح الغرفة المشتركة مع ${friendName}...`);
+    window.location.href = `play.html?roomId=${existingRoom.id}`;
+    return;
+  }
+
+  const res = await fetch(ROOMS_API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      playerXId: currentUserId,
+      playerOId: friendId,
+      board: Array(9).fill(""),
+      currentPlayer: "X",
+      winner: "",
+      createdAt: new Date().toISOString()
+    })
+  });
+
+  const room = await res.json();
+  if (room?.id) {
+    alert(`تم إنشاء غرفة جديدة مع ${friendName} (Room ID: ${room.id})`);
+    window.location.href = `play.html?roomId=${room.id}`;
+  } else {
+    alert("❌ فشل في إنشاء الغرفة.");
+  }
+}
+
+// 🎮 إعادة اللعب في نفس الغرفة
+document.getElementById("replayBtn").onclick = async () => {
+  if (!lastRoom || !currentUserId) return;
+
+  const roomRes = await fetch(`${ROOMS_API}/${lastRoom}`);
+  const room = await roomRes.json();
+
+  const resetRoom = {
+    playerXId: room.playerXId,
+    playerOId: room.playerOId,
+    board: Array(9).fill(""),
+    currentPlayer: "X",
+    winner: "",
+    createdAt: new Date().toISOString()
+  };
+
+  await fetch(`${ROOMS_API}/${lastRoom}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(resetRoom)
+  });
+
+  window.location.href = `play.html?roomId=${lastRoom}`;
+};
+
+fetchData();
+</script>
+
+</body>
+</html>

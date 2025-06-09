@@ -351,6 +351,8 @@
   <div class="game-board" id="game-board"></div>
 
   <div class="controls">
+   
+
     <select id="board-size-select" class="btn-secondary">
   <option value="3">3 × 3</option>
   <option value="4" selected>4 × 4</option>
@@ -364,6 +366,9 @@
       <i class="fas fa-question-circle"></i> كيف تلعب
     </button>
   </div>
+   <h2 style="text-align:center; margin: 2rem 0 1rem; color: var(--primary-color)">📊 <a href="friends-results.html">نتائج أصدقائك</a></h2>
+   
+<!-- <div class="users-container" id="friendsStats" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;"></div> -->
 </div>
 
 <!-- نافذة النتائج -->
@@ -874,11 +879,76 @@ function makeAIMove() {
 
   // --- تنفيذ عند تحميل الصفحة ---
   window.addEventListener('DOMContentLoaded', async () => {
+    const USERS_API = "https://6844373271eb5d1be032b52a.mockapi.io/users";
+const FRIENDS_API = "https://68458d2ffc51878754dba0bb.mockapi.io/friends";
+
+async function loadFriendsAndStats() {
+  try {
+    const [friendsRes, usersRes, gamesRes] = await Promise.all([
+      fetch(FRIENDS_API),
+      fetch(USERS_API),
+      fetch("https://68458d2ffc51878754dba0bb.mockapi.io/games")
+    ]);
+
+    const allFriends = await friendsRes.json();
+    const allUsers = await usersRes.json();
+    const allGames = await gamesRes.json();
+
+    const myFriends = allFriends.filter(f =>
+      f.userId === userId
+    ).map(f => f.friendId);
+
+    const mutualFriends = myFriends.filter(fid =>
+      allFriends.some(f => f.userId === fid && f.friendId === userId)
+    );
+
+    const container = document.getElementById("friendsStats");
+    container.innerHTML = "";
+
+    mutualFriends.forEach(friendId => {
+      const user = allUsers.find(u => u.id === friendId);
+      const userGames = allGames.filter(g => g.userId === friendId);
+
+      let xWins = 0, oWins = 0, draws = 0;
+      userGames.forEach(g => {
+        xWins += g.xWins || 0;
+        oWins += g.oWins || 0;
+        draws += g.draws || 0;
+      });
+
+      const card = document.createElement("div");
+      card.className = "user-card";
+      card.style.width = "220px";
+      card.innerHTML = `
+        <img src="${user.imageData || 'https://via.placeholder.com/100'}" alt="${user.name}">
+        <h3>${user.name}</h3>
+        <p style="font-size:14px;">X: ${xWins} | O: ${oWins} | تعادل: ${draws}</p>
+        <button class="add-btn" onclick="startOnlineGame('${user.id}', '${user.name}')">العب مع صديق</button>
+      `;
+      container.appendChild(card);
+    });
+  } catch (err) {
+    console.error("فشل في تحميل بيانات الأصدقاء:", err);
+  }
+}
+
     checkLogin();
     await loadLastGameFromMockAPI();
+    await loadFriendsAndStats();
     initGame();
     displayUserStats();
   });
+
+
+
+  function startOnlineGame(friendId, friendName) {
+  alert(`🚀 سيتم بدء اللعب ضد ${friendName} (ID: ${friendId})`);
+  // يمكنك هنا تخزين ID في sessionStorage ثم فتح صفحة جديدة:
+  sessionStorage.setItem("opponentId", friendId);
+  // مثلاً:
+  // window.location.href = "online-xo.html";
+}
+
 </script>
 </body>
 </html>
