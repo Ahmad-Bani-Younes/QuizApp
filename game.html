@@ -320,8 +320,25 @@
     <input type="checkbox" id="ai-mode" />
     ضد الكمبيوتر 🤖
   </label>
-</div>
+     <h2 style="text-align:center; margin: 2rem 0 1rem; color: var(--primary-color)">📊 <a href="friends-results.html">العب مع صديقك اونلاين </a></h2>
 
+</div>
+  <div class="controls">
+   
+
+    <select id="board-size-select" class="btn-secondary">
+  <option value="3">3 × 3</option>
+  <option value="4" selected>4 × 4</option>
+  <option value="5">5 × 5</option>
+</select>
+
+    <button class="btn-primary" id="reset-btn">
+      <i class="fas fa-redo"></i> إعادة اللعبة
+    </button>
+    <button class="btn-secondary" id="how-to-play-btn">
+      <i class="fas fa-question-circle"></i> كيف تلعب
+    </button>
+  </div>
   <div class="game-info">
     <div class="player-turn">
       <i class="fas fa-user"></i>
@@ -350,23 +367,7 @@
 
   <div class="game-board" id="game-board"></div>
 
-  <div class="controls">
-   
 
-    <select id="board-size-select" class="btn-secondary">
-  <option value="3">3 × 3</option>
-  <option value="4" selected>4 × 4</option>
-  <option value="5">5 × 5</option>
-</select>
-
-    <button class="btn-primary" id="reset-btn">
-      <i class="fas fa-redo"></i> إعادة اللعبة
-    </button>
-    <button class="btn-secondary" id="how-to-play-btn">
-      <i class="fas fa-question-circle"></i> كيف تلعب
-    </button>
-  </div>
-   <h2 style="text-align:center; margin: 2rem 0 1rem; color: var(--primary-color)">📊 <a href="friends-results.html">نتائج أصدقائك</a></h2>
    
 <!-- <div class="users-container" id="friendsStats" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;"></div> -->
 </div>
