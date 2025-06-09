@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>لعب مع صديق - السلم والحية</title>
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #3a0ca3;
+    }
+    .status {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #333;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 5px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    .cell {
+      background: white;
+      border: 2px solid #ccc;
+      font-size: 2rem;
+      font-weight: bold;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .cell:hover {
+      background: #e6f7ff;
+    }
+    .link-box {
+      background: #fff3cd;
+      padding: 10px;
+      margin: 20px auto;
+      width: fit-content;
+      border-radius: 8px;
+      border: 1px solid #ffeeba;
+    }
+    button {
+      padding: 10px 20px;
+      background: #4361ee;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #3a0ca3;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎲 لعبة السلم والحية - أونلاين</h1>
+  <div id="info"></div>
+  <div id="board" class="board"></div>
+  <div class="status" id="statusText">جاري تحميل الغرفة...</div>
+  <script>
+    const apiBase = "https://6846d3507dbda7ee7ab07f48.mockapi.io/rooms";
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomId = urlParams.get("room");
+    let currentPlayer = sessionStorage.getItem("playerId") || null;
+    let roomData = null;
+    const boardEl = document.getElementById("board");
+    const statusEl = document.getElementById("statusText");
+    const infoEl = document.getElementById("info");
+
+    async function fetchRoom() {
+      const res = await fetch(`${apiBase}/${roomId}`);
+      return await res.json();
+    }
+
+    async function updateRoom(data) {
+      await fetch(`${apiBase}/${roomId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+    }
+
+    function renderBoard(boardStr) {
+      boardEl.innerHTML = "";
+      const cells = boardStr.split(",");
+      cells.forEach((val, i) => {
+        const div = document.createElement("div");
+        div.className = "cell";
+        div.textContent = val === "-" ? "" : val;
+        div.onclick = async () => {
+          if (!currentPlayer || currentPlayer !== roomData.currentPlayer || val !== "-") return;
+          cells[i] = currentPlayer;
+          const newBoard = cells.join(",");
+          const nextPlayer = currentPlayer === "X" ? "O" : "X";
+          let winner = checkWinner(cells);
+          await updateRoom({
+            board: newBoard,
+            currentPlayer: winner ? null : nextPlayer,
+            winner: winner || ""
+          });
+          loadRoom(); // تحديث
+        };
+        boardEl.appendChild(div);
+      });
+    }
+
+    function checkWinner(cells) {
+      const wins = [
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
+      ];
+      for (let combo of wins) {
+        const [a, b, c] = combo;
+        if (cells[a] !== "-" && cells[a] === cells[b] && cells[b] === cells[c]) {
+          return cells[a];
+        }
+      }
+      return null;
+    }
+
+    async function loadRoom() {
+      roomData = await fetchRoom();
+      if (!currentPlayer) {
+        if (!roomData.playerXId) {
+          currentPlayer = "X";
+          sessionStorage.setItem("playerId", "X");
+          await updateRoom({ playerXId: "joined" });
+        } else if (!roomData.playerOId) {
+          currentPlayer = "O";
+          sessionStorage.setItem("playerId", "O");
+          await updateRoom({ playerOId: "joined" });
+        } else {
+          statusEl.textContent = "الغرفة ممتلئة بالفعل!";
+          return;
+        }
+      }
+
+      renderBoard(roomData.board);
+      if (roomData.winner) {
+        statusEl.textContent = `🏆 اللاعب ${roomData.winner} فاز!`;
+      } else if (roomData.currentPlayer === currentPlayer) {
+        statusEl.textContent = "🎯 دورك الآن";
+      } else {
+        statusEl.textContent = "⏳ بانتظار اللاعب الآخر...";
+        setTimeout(loadRoom, 1500);
+      }
+    }
+
+    async function createRoom() {
+      const res = await fetch(apiBase, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          playerXId: "",
+          playerOId: "",
+          board: "-,-,-,-,-,-,-,-,-",
+          currentPlayer: "X",
+          winner: "",
+          createdAt: new Date().toISOString()
+        })
+      });
+      const data = await res.json();
+      window.location.href = `play-online.html?room=${data.id}`;
+    }
+
+    if (!roomId) {
+      infoEl.innerHTML = `
+        <p>لعب مع صديق؟ اضغط الزر وشارك الرابط معه👇</p>
+        <button onclick="createRoom()">إنشاء غرفة جديدة</button>
+      `;
+      statusEl.textContent = "";
+    } else {
+      infoEl.innerHTML = `<div class="link-box">شارك هذا الرابط مع صديقك: <br><b>${location.href}</b></div>`;
+      loadRoom();
+    }
+  </script>
+</body>
+</html>
